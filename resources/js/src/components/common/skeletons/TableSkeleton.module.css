@@ -1,0 +1,54 @@
+/* TableSkeleton.module.css */
+
+.skeletonRow {
+    display: table-row;
+}
+
+.skeletonCell {
+    display: table-cell;
+    height: 20px;
+    background-color: #e0e0e0;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    animation: pulse 1.5s ease-in-out infinite;
+    padding: 8px;
+}
+
+/* Largura simulada para cada coluna */
+.skeletonCell:nth-child(1) {
+    width: 80px; /* Data */
+}
+
+.skeletonCell:nth-child(2) {
+    width: 120px; /* Plataforma */
+}
+
+.skeletonCell:nth-child(3) {
+    width: 80px; /* Moeda */
+}
+
+.skeletonCell:nth-child(4) {
+    width: 100px; /* Valor */
+}
+
+.skeletonCell:nth-child(5) {
+    width: 150px; /* Tag de Produto */
+}
+
+.skeletonCell:nth-child(6) {
+    width: 100px; /* Ação */
+}
+
+/* Animação de pulsação */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+    100% {
+        opacity: 1;
+    }
+}

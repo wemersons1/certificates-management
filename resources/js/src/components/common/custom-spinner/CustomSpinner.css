@@ -1,0 +1,31 @@
+.loading-logo {
+  width: 50px;
+  height: 50px;
+  background: url('../../../assets//images//brand-logos/toggle-logo.png') no-repeat center;
+  background-size: contain;
+  mask-image: linear-gradient(to top, black 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 0%, transparent 100%);
+  mask-size: 100% 200%;
+  -webkit-mask-size: 100% 200%;
+  animation: cascade 2s linear infinite, zoomEffect 2s ease-in-out infinite;
+}
+
+@keyframes cascade {
+  0% {
+      mask-position: 0 40%;
+      -webkit-mask-position: 0 100%;
+  }
+  100% {
+      mask-position: 0 0%;
+      -webkit-mask-position: 0 0%;
+  }
+}
+
+@keyframes zoomEffect {
+  0%, 100% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1.1);
+  }
+}

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização HTML do Certificado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&amp;family=Allura&amp;family=Architects+Daughter&amp;family=Bad+Script&amp;family=Berkshire+Swash&amp;family=Cinzel+Decorative&amp;family=Cinzel:wght@500;700&amp;family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&amp;family=Cormorant:ital,wght@0,400;0,500;0,600;1,400&amp;family=Dancing+Script:wght@400;600;700&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Great+Vibes&amp;family=Herr+Von+Muellerhoff&amp;family=Inter:wght@300;400;600&amp;family=Italianno&amp;family=Kaushan+Script&amp;family=La+Belle+Aurore&amp;family=Libre+Baskerville:ital@0;1&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400&amp;family=Marck+Script&amp;family=Montserrat+Alternates:wght@400;600&amp;family=Montserrat:wght@400;600;700;800&amp;family=Mr+De+Haviland&amp;family=Niconne&amp;family=Oswald:wght@300;400;600&amp;family=Parisienne&amp;family=Petit+Formal+Script&amp;family=Pinyon+Script&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,400&amp;family=Quintessential&amp;family=Roboto:wght@300;400;500;700&amp;family=Sacramento&amp;family=Satisfy&amp;family=Tangerine:wght@700&amp;family=Yellowtail&amp;family=Outfit:wght@300;400;600&amp;family=Poppins:wght@300;400;600&amp;family=Raleway:wght@300;400;600&amp;family=Lato:wght@300;400;700&amp;family=Open+Sans:wght@300;400;600&amp;family=Baskervville&amp;family=Crimson+Text&amp;family=Cardo&amp;family=Prata&amp;family=DM+Serif+Display&amp;family=Playfair+Display+SC&amp;family=Cormorant+Unicase&amp;family=Fraunces&amp;family=Bodoni+Moda&amp;family=Rochester&amp;family=Mrs+Saint+Delafield&amp;family=Monsieur+La+Doulaise&amp;family=Qwigley&amp;family=WindSong&amp;display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+            overflow: auto;
+            font-family: 'Inter', sans-serif;
+        }
+        .pattern-shape-1 {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            top: -50px;
+            left: -50px;
+        }
+        .pattern-shape-2 {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            bottom: -50px;
+            right: -30px;
+        }
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .cert-container {
+                box-shadow: none !important;
+                margin-bottom: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex; flex-direction: column; gap: 40px; width: 100%; max-width: 1200px; align-items: center;">
+        <div style="display: flex; justify-content: space-between; width: 100%; max-width: 1123px; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 12px 24px; border-radius: 12px; backdrop-filter: blur(12px);">
+            <div>
+                <h2 style="font-size: 16px; font-weight: 700; color: #fff;">Visualização do HTML Renderizado</h2>
+                <p style="font-size: 12px; color: #94a3b8; margin-top: 2px;">Este é o HTML exato que será exportado para geração do PDF.</p>
+            </div>
+            <button onclick="window.print()" style="background: #fa3f7a; border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                Imprimir / Salvar PDF
+            </button>
+        </div>
+        
+        
+        <div class="cert-container" style="
+            width: 1123px;
+            height: 794px;
+            flex-shrink: 0;
+            background-color: #ffffff;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            page-break-after: always;
+            margin-bottom: 30px;
+        ">
+            
+
+            <img src="https://flash-certificados-bucket.s3.sa-east-1.amazonaws.com/frames/logo_6a10d2b6894986.88761499.jpeg" referrerpolicy="no-referrer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; object-fit: fill;" alt="Moldura do Banco">
+
+            <div class="content-side" style="
+            position: relative;
+            padding: 0px;
+            z-index: 2;
+            width: 100%; height: 100%;
+            
+            
+        ">
+                
+                
+                
+        <div style="
+            position: absolute;
+            left: 50.93499554764025%;
+            top: 5.415617128463476%;
+            transform: translate(-50%, 0);
+            font-size: 77px;
+            color: #1e293b;
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+            font-style: italic;
+            
+            text-align: center;
+            width: auto; max-width: 90%;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            CERTIFICADO
+        </div>
+        <div style="
+            position: absolute;
+            left: 51%;
+            top: 18%;
+            transform: translate(-50%, 0);
+            font-size: 22px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: normal;
+            
+            
+            text-align: center;
+            width: auto; max-width: 90%;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            CERTIFICAMOS QUE
+        </div>
+        <div style="
+            position: absolute;
+            left: 50.84594835262689%;
+            top: 24.055415617128464%;
+            transform: translate(-50%, 0);
+            font-size: 24px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            
+            
+            text-align: center;
+            width: auto; max-width: 90%;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            {{nome_aluno}}
+        </div>
+        <div style="
+            position: absolute;
+            left: 50.84594835262689%;
+            top: 31.360201511335013%;
+            transform: translate(-50%, 0);
+            font-size: 28px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            
+            
+            text-align: center;
+            width: auto; max-width: 90%;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            {{funcao_aluno}}
+        </div>
+        <div style="
+            position: absolute;
+            left: 49.68833481745325%;
+            top: 42.0654911838791%;
+            transform: translate(-50%, 0);
+            font-size: 18px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: normal;
+            
+            
+            text-align: justify;
+            width: 1056px;
+            min-height: 98px; height: auto;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            Participou e concluiu com aproveitamento da capacitação de {{nome_curso}} conforme subitem: 1.1 do anexo II da NR-12 e subitem: 31.12.69 da NR-31, com carga horaria de {{carga_horaria}}, realizado nos dias a {{periodo_curso}}, ministrado pelo Técnico em Segurança do Trabalho Jurandir da Silva Santos MTE:0044024/PA e CRT: 57789398504/BA.
+        </div>
+        <div style="
+            position: absolute;
+            left: 48.975957257346394%;
+            top: 56.297229219143574%;
+            transform: translate(-50%, 0);
+            font-size: 24px;
+            color: #3fab5a;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            
+            
+            text-align: center;
+            width: auto; max-width: 90%;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            EDUCAÇÃO CONTINUADA
+        </div>
+        <div style="
+            position: absolute;
+            left: 48.53072128227961%;
+            top: 63.09823677581864%;
+            transform: translate(-50%, 0);
+            font-size: 22px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            
+            
+            text-align: center;
+            width: auto; max-width: 90%;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            {{cidade_de_realizacao}}, {{data_de_emissao}}
+        </div>
+            </div>
+        </div>
+        
+        <div class="cert-container" style="
+            width: 1123px;
+            height: 794px;
+            flex-shrink: 0;
+            background-color: #ffffff;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            page-break-after: always;
+            margin-bottom: 30px;
+        ">
+            
+
+            <img src="https://flash-certificados-bucket.s3.sa-east-1.amazonaws.com/frames/logo_6a10d2b73134c4.49959063.jpeg" referrerpolicy="no-referrer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; object-fit: fill;" alt="Moldura do Banco">
+
+            <div class="content-side" style="
+            position: relative;
+            padding: 0px;
+            z-index: 2;
+            width: 100%; height: 100%;
+            
+            
+        ">
+                
+                
+                
+        <div style="
+            position: absolute;
+            left: 83%;
+            top: 3.8539042821158693%;
+            transform: translate(-50%, 0);
+            font-size: 14px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            
+            
+            text-align: center;
+            width: auto; max-width: 90%;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            CNPJ: 59.127.932/0001-42
+        </div>
+        <div style="
+            position: absolute;
+            left: 83%;
+            top: 7.997481108312343%;
+            transform: translate(-50%, 0);
+            font-size: 12px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            
+            
+            text-align: center;
+            width: auto; max-width: 90%;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            JS-TREINAMENTOS (Jurandir da Silva Santos)
+        </div>
+        <div style="
+            position: absolute;
+            left: 82.63579697239537%;
+            top: 11.335012594458437%;
+            transform: translate(-50%, 0);
+            font-size: 15px;
+            color: #202122;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: normal;
+            
+            
+            text-align: left;
+            width: 338px;
+            min-height: 180px; height: auto;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            artigo 42, da lei nº. 9.394/96, Decreto nº.5.154/04, Deliberação do CCE 14/97 e Decreto nº 2.208/97 - Diretrizes e Bases da Educação Nacional que diz: não necessitam de prévia autorização para funcionamento nem de posterior reconhecimento do Conselho deEducação competente cursos livres de educação continuada.
+        </div>
+        <div style="
+            position: absolute;
+            left: 34.55031166518255%;
+            top: 2.8967254408060454%;
+            transform: translate(-50%, 0);
+            font-size: 23px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            
+            
+            text-align: left;
+            width: 731px;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            CONTEÚDO PROGRAMÁTICO DA CAPACITAÇÃOSubitem: 31.12.69
+        </div>
+        <div style="
+            position: absolute;
+            left: 34.016028495102404%;
+            top: 11.460957178841308%;
+            transform: translate(-50%, 0);
+            font-size: 19px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: normal;
+            
+            
+            text-align: justify;
+            width: 730px;
+            min-height: 344px; height: auto;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            a) legislação de segurança e saúde no trabalho e noções de legislação detrânsito; b) identificação das fontes geradoras dos riscos à integridade física e à saúde do trabalhador; c) noções sobre acidentes e doenças decorrentes da exposição aos riscos existentes na máquina e implementos; d) medidas de controle dos riscos: Proteção Coletiva e Equipamento de Proteção 4Individual; e) operação da máquina e implementos com segurança; f) inspeção, regulagem e manutenção com segurança; g) sinalização de segurança; h) procedimentos em situação de emergência; e i) noções sobre prestação de primeiros socorros. NR-12, ANEXO II e Subitem 1.1Medidas de controle dos riscos EPC e EPI NR-06, Operação com segurança, Inspeção, regulagem e manutenção preventiva Sinalização de segurança, Procedimentos, em situação de emergência, Analise de Risco (APR), NR-11 Transporte, movimentação, armazenagem e manuseio, de materiais, Práticas Operacionais.
+        </div>
+        <div style="
+            position: absolute;
+            left: 83.52626892252894%;
+            top: 75.81863979848868%;
+            transform: translate(-50%, 0);
+            font-size: 14px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: normal;
+            
+            
+            text-align: center;
+            width: 332px;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            Everson Pereira Gomes
+Instrutor de Segurança do Trabalho
+Técnico em Segurança do Trabalho
+MTE/RG N° 0008300/BA
+        </div>
+        <div style="
+            position: absolute;
+            left: 83.43722172751559%;
+            top: 42.44332493702771%;
+            transform: translate(-50%, 0);
+            font-size: 15px;
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: normal;
+            
+            
+            text-align: center;
+            width: 250px;
+            
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        ">
+            Jurandir da Silva SantosInstrutor de Trânsito , Máquinas
+Pesadas e Técnico em Segurança do
+Trabalho MTE:0044024/PA
+Técnico em mecânica
+Detran/BA N° 6665
+57789398504
+        </div>
+            </div>
+        </div>
+    </div>
+
+</body></html>

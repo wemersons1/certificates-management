@@ -1,0 +1,170 @@
+{
+    "languages": {
+        "ptBr": "Português",
+        "enUs": "English",
+        "es": "Español"
+    },
+
+    "sidebar": {
+        "home": "Inicio",
+        "dashboard": "Dashboard",
+        "orders": "Pedidos",
+        "products": "Productos",
+        "ads": "Anuncios",
+        "additional_values": "Valores Adicionales",
+        "integrations": "Integraciones",
+        "pricing_spreadsheet": "Hoja de Precios"
+    },
+
+    "page_titles": {
+        "home": "Home",
+        "dashboard": "Dashboard",
+        "orders": "Pedidos",
+        "products": "Productos",
+        "ads": "Anuncios",
+        "additional_values": "Valores Adicionales",
+        "integrations": "Integraciones",
+        "pricing_spreadsheet": "Hoja de Precios",
+        "my_profile": "Mi Perfil",
+        "personal_data": "Datos Personales",
+        "plan_management": "Gestión de Planes",
+        "password_change": "Cambio de Contraseña",
+        "store_management": "Gestión de Tienda",
+        "users": "Usuarios",
+        "plans": "Planes",
+        "plans_benefits": "Beneficios de Planes",
+        "clients": "Clientes"
+    },
+
+    "pages": {
+
+        "home": {
+            "welcome": "Bienvenido",
+            "new_update": "¡Nueva Actualización!",
+            "new_update_message": "Estamos trabajando para un mejor rendimiento. Nueva Actualización V.0.1",
+            "tutorials": "Tutoriales",
+            "tutorial_message": "¡Bienvenido! Mira el tutorial de integración."
+
+        },
+        
+        "dashboard": {
+            "overview": "Resumen",
+            "total_orders": "Total de Pedidos",
+            "revenue": "Ingresos",
+            "costs": "Costos",
+            "marketing": "Marketing",
+            "see_more": "Ver más",
+            "net_profit": "Beneficio Neto",
+            "predicted_profit": "Beneficio Previsto",
+            "profit_margin": "Margen de Beneficio",
+            "roi": "ROI",
+            "average_profit": "Beneficio / Pedido Entregado",
+            "predicted": "Previsto",
+            "gross_revenue": "Ingresos Brutos",
+            "cpa": "Costo por Adquisición",
+            "average_ticket": "Ticket Promedio",
+            "devolution_average_ticket": "Ticket Promedio de Devolución",
+            "devolutions": "Devoluciones",
+            "order_report": "Reporte de Pedidos",
+            "pending": "Pendientes",
+            "delivered": "Entregados",
+            "units": "unidades",
+            "confirmation": "Confirmación",
+            "shipping": "Envío",
+            "canceled": "Cancelados",
+            "effectiveness": "Efectividad",
+            "returned": "Devueltos",
+            "logistics": "Logística",
+            "confirmed_orders": "Pedidos Confirmados",
+            "canceled_orders": "Pedidos Cancelados",
+            "pending_confirmation_orders": "Pedidos Pendientes de Confirmación",
+            "pending_shipping_orders": "Pedidos Pendientes de Envío",
+            "average_shipping_cost": "Costo Promedio de Envío por Pedido",
+            "delivered_orders": "Pedidos Entregados",
+            "returned_orders": "Pedidos Devueltos",
+            "news_orders": "Novedades",
+            "transit_orders": "En Tránsito",
+            "news": "Novedades",
+            "states_ranking": "Ranking de Estados",
+            "distribution_companies_ranking": "Ranking de Transportistas",
+            "income": "Ingresos",
+            "average_amount_earned": "Ticket Promedio de Ganancias",
+            "additional_values": "Valores Adicionales",
+            "more_profitable_products": "Productos Más Rentables",
+            "more_profitable_states": "Estados Más Rentables",
+            "total_cost": "Costos Totales",
+            "product_cost": "Costo de Productos",
+            "average_order_cost": "Costo Promedio por Pedido",
+            "total_shipping_cost": "Costo Total de Envío",
+            "delivered_shipping_cost": "Costo de Envío Entregados",
+            "devolution_shipping_cost": "Costo de Envío de Devoluciones",
+            "taxes": "Impuestos",
+            "administrative_fee": "Tarifa Administrativa",
+            "total_taxes": "Total de Impuestos y Tarifas",
+            "cost_over_revenue": "% de Costo sobre Ingresos",
+            "marketing_investment": "Inversión en Marketing",
+            "real_cpa": "CPA Real",
+            "predicted_real_cpa": "CPA Real Previsto",
+            "predicted_real_roas": "ROAS Real Previsto",
+            "roas": "ROAS",
+            "real_roas": "ROAS Real",
+            "investment_by_platform": "Inversión por Plataforma"
+        },
+
+        "stores": {
+            "welcome": "Bienvenido",
+            "select_store": "Seleccione la tienda a la que desea acceder",
+            "currency": "Moneda",
+            "setup_store": "Configurar tienda",
+            "setup_new_store": "Configurar nueva tienda",
+            "logout": "Cerrar sesión"
+        },
+        "setup": {
+            "title": "Configuración Inicial",
+            "subtitle": "Para continuar, es necesario que configure una tienda.",
+            "form_title1": "Nombre y País de la Tienda",
+            "form_subtitle1": "¿Cuál es el nombre de su tienda y en qué país está operando?",
+            "store_name": "Nombre de la Tienda",
+            "store_name_placeholder": "Ingrese el nombre de la tienda",
+            "store_country_placeholder": "Seleccione el país de la tienda",
+            "store_country": "País de la Tienda",
+            "form_title2": "Moneda",
+            "form_subtitle2": "Elija la moneda en la que prefiere ver los datos.",
+            "currency_placeholder": "Seleccione una moneda",
+            "form_title3": "Impuesto y Tarifa Administrativa",
+            "form_subtitle3": "Ingrese los valores del impuesto y la tarifa administrativa.",
+            "tax": "Impuesto (%)",
+            "administrative_fee": "Tarifa Administrativa (%)"
+        }
+    },
+
+    "components": {
+        "date_filter": {
+            "today": "Hoy",
+            "yesterday": "Ayer",
+            "7_days": "7 Días",
+            "30_days": "30 Días",
+            "select_period": "Seleccionar Período"
+        },
+        "choose_stores": {
+            "manage_stores": "Gestionar Tiendas",
+            "manage_stores_message": "Actualiza la información de las tiendas y configura una nueva tienda.",
+            "currency": "Moneda",
+            "setup_new_store": "Configurar nueva tienda",
+            "setup_store": "Configurar tienda"
+        }
+    },
+
+    "buttons": {
+        "register": "Registrar",
+        "cancel": "Cancelar",
+        "forward": "Avanzar",
+        "go_back": "Volver",
+        "complete": "Completar",
+        "view_tutorials": "Ver tutoriales"
+    },
+
+    "status": {
+        "saving": "Guardando..."
+    }
+}

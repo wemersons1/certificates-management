@@ -1,0 +1,15 @@
+
+@import "./assets/css/styles.css";
+@import "./assets/css/icons.css";
+
+@import "react-datepicker/dist/react-datepicker.css"; //datepicker
+@import 'simplebar-react/dist/simplebar.min.css'; //simplebar
+@import "@simonwep/pickr/dist/themes/classic.min.css"; //simonwep colorpicker
+@import "@simonwep/pickr/dist/themes/monolith.min.css"; //simonwep colorpicker
+@import "@simonwep/pickr/dist/themes/nano.min.css"; //simonwep colorpicker
+@import 'react-toastify/dist/ReactToastify.css';
+
+@import "./assets/css/global/modern.css";
+
+/* Premium Modals & SweetAlert2 — loaded last for highest priority */
+@import "./assets/css/global/premium-modals.css";

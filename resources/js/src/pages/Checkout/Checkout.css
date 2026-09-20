@@ -1,0 +1,1401 @@
+/* ============================================================
+   CHECKOUT PAGE — Layout & Design
+   ============================================================ */
+
+.checkout-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background: linear-gradient(145deg, #eef2ff 0%, #f0f4f8 60%, #e8f4fd 100%);
+    padding: 4rem 1.5rem 2.5rem;
+    /* Aumentado o padding superior */
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+.checkout-container {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1060px;
+    align-items: flex-start;
+}
+
+/* ── FORM COLUMN ── */
+.checkout-form-col {
+    flex: 1.3;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ── HEADER ── */
+.ck-header {
+    margin-bottom: 0.5rem;
+}
+
+.ck-secure-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ecfdf5;
+    color: #059669;
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 8px 16px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    /* Empurra para baixo para não ficar cortado */
+    border: 1px solid #10b98144;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.1);
+    text-transform: uppercase;
+}
+
+.ck-secure-tag svg {
+    stroke-width: 3;
+}
+
+.ck-secure-tag--prominent {
+    /* Removendo estilos anteriores que eram muito escuros */
+}
+
+.ck-title {
+    font-family: 'Montserrat', 'Nunito', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.2;
+    margin: 0 0 0.3rem;
+}
+
+.ck-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* ── BLOCKS ── */
+.ck-block {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(37, 99, 235, 0.05);
+    border: 1px solid #f1f5f9;
+}
+
+.ck-block-title {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: 'Montserrat', 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+/* ── PLAN CARDS ── */
+.plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+}
+
+.plan-card {
+    position: relative;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 0.9rem 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    background: #fafbff;
+    text-align: center;
+    user-select: none;
+    outline: none;
+}
+
+.plan-card:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.1);
+}
+
+.plan-card--selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+}
+
+.plan-card__check {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.plan-card__name {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #1e293b;
+    margin-bottom: 0.4rem;
+}
+
+.plan-card__price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px;
+    margin-bottom: 0.3rem;
+}
+
+.price--currency {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.price--value {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #2563eb;
+    line-height: 1;
+}
+
+.price--period {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.price--free {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #10b981;
+}
+
+.plan-card__certs {
+    font-size: 0.72rem;
+    color: #64748b;
+    background: #f1f5f9;
+    border-radius: 20px;
+    padding: 2px 8px;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+/* Mobile benefits */
+.plan-benefits-sm {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.plan-benefit-sm-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+/* ── PERIOD TOGGLE ── */
+.period-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.period-btn {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    background: #fafbff;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    outline: none;
+}
+
+.period-btn:hover {
+    border-color: #93c5fd;
+}
+
+.period-btn--active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 2px 12px rgba(37, 99, 235, 0.12);
+}
+
+.period-btn__label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #1e293b;
+}
+
+.period-btn__price {
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.period-savings-badge {
+    background: #dcfce7;
+    color: #16a34a;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 20px;
+    letter-spacing: 0.02em;
+}
+
+.period-installments-info {
+    display: block;
+    font-size: 0.8rem;
+    color: #10b981;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.period-installments-info strong {
+    font-weight: 900;
+    font-size: 0.9rem;
+}
+
+/* ── PAYMENT METHOD TABS ── */
+.payment-method-tabs {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.pm-tab {
+    flex: 1;
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    background: #fafbff;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #475569;
+    transition: border-color 0.18s, background 0.18s, color 0.18s;
+    outline: none;
+}
+
+.pm-tab:hover {
+    border-color: #93c5fd;
+    color: #2563eb;
+}
+
+.pm-tab--active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #2563eb;
+    box-shadow: 0 2px 12px rgba(37, 99, 235, 0.12);
+}
+
+/* ── MERCADO PAGO FORM (kept intact) ── */
+#form-checkout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+}
+
+.form * {
+    outline: none;
+}
+
+.form input:focus,
+.form select:focus,
+.form div:focus {
+    box-shadow: rgba(9, 30, 66, 0.15) 0px 0px 0px 3px;
+}
+
+.form input,
+.form select,
+.form option,
+.form div {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.8rem;
+    height: 2.8rem;
+    text-indent: 0.5rem;
+    margin: 0.3rem 0;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    text-align: left;
+    box-sizing: border-box;
+    background: #fff;
+    color: #1e293b;
+}
+
+.form iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.form input::placeholder {
+    font-size: 0.95rem;
+    color: #94a3b8;
+}
+
+/* Override for layout wrapper divs inside form */
+.form .field-wrap,
+.form .form-row-2,
+.form .billing-day-wrap,
+.form .billing-days,
+.form .error-wrap {
+    height: auto !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    text-indent: 0 !important;
+    background: transparent !important;
+}
+
+/* ── FORM LAYOUT HELPERS ── */
+.field-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+}
+
+.field-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.recurrence-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #2563eb;
+    background: #eff6ff;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.annual-installment-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.annual-installment-icon {
+    background: #dcfce7;
+    color: #16a34a;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.annual-installment-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.annual-installment-text strong {
+    font-size: 0.9rem;
+    color: #166534;
+    font-weight: 800;
+}
+
+.annual-installment-text span {
+    font-size: 0.85rem;
+    color: #15803d;
+    line-height: 1.4;
+}
+
+/* ── BILLING DAY ── */
+.billing-day-wrap {
+    margin-bottom: 0.75rem;
+}
+
+.billing-days {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.billing-day-btn {
+    width: 44px;
+    height: 44px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fafbff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+.billing-day-btn:hover {
+    border-color: #93c5fd;
+    color: #2563eb;
+}
+
+.billing-day-btn--active {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+}
+
+/* ── ERROR MESSAGES ── */
+.error-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 0.5rem;
+}
+
+/* ── CTA BUTTON ── */
+.button-payment {
+    background: linear-gradient(110deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+    color: #fff;
+    font-weight: 800;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 1.5rem;
+    transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+    cursor: pointer;
+    outline: none;
+    letter-spacing: 0.01em;
+}
+
+.button-payment:hover:not(:disabled) {
+    background: linear-gradient(110deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(37, 99, 235, 0.38);
+}
+
+.button-payment:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.button-payment:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── PIX SECTION ── */
+.pix-block {
+    text-align: center;
+}
+
+.pix-instructions {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.pix-price-badge {
+    display: inline-block;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #2563eb;
+    background: #eff6ff;
+    padding: 0.4rem 1.2rem;
+    border-radius: 40px;
+}
+
+.pix-price-badge span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.pix-qr-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pix-qr-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    border: 3px solid #e2e8f0;
+    padding: 6px;
+    background: #fff;
+}
+
+.pix-copy-area {
+    width: 100%;
+    max-width: 400px;
+}
+
+.pix-copy-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 0.4rem;
+    text-align: left;
+}
+
+.pix-copy-box {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.pix-code-input {
+    flex-grow: 1;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    padding: 0.65rem 0.85rem !important;
+    font-size: 0.85rem;
+    color: #475569;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: auto !important;
+    margin: 0 !important;
+    text-indent: 0 !important;
+    border-radius: 0 !important;
+}
+
+.pix-copy-btn {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 0.65rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.pix-copy-btn:hover {
+    background: #1d4ed8;
+}
+
+.pix-waiting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.pix-pulse {
+    width: 8px;
+    height: 8px;
+    background: #f59e0b;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.4);
+        opacity: 0.6;
+    }
+}
+
+.pix-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.pix-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* ── TRUST BAR ── */
+.ck-trust-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 0.75rem 0;
+    flex-wrap: wrap;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* ── ORDER SUMMARY COLUMN ── */
+.checkout-summary-col {
+    flex: 0 0 310px;
+    position: sticky;
+    top: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.order-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 24px rgba(37, 99, 235, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    margin-top: 30px;
+}
+
+.order-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+.order-card__plan-icon {
+    width: 42px;
+    height: 42px;
+    background: #eff6ff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.order-card__plan-name {
+    font-family: 'Montserrat', 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.order-card__plan-type {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.order-card__price-area {
+    margin-bottom: 1rem;
+}
+
+.order-price {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+}
+
+.order-price__prefix {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.order-price__amount {
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: #2563eb;
+    line-height: 1;
+    font-family: 'Montserrat', 'Nunito', sans-serif;
+}
+
+.order-price__period {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.order-price__free {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #10b981;
+}
+
+.order-card__annual-note {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+.order-card__savings-tag {
+    display: inline-block;
+    background: #dcfce7;
+    color: #16a34a;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 0.4rem;
+}
+
+.order-card__divider {
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    margin: 1rem 0;
+}
+
+.order-card__benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.order-benefit {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #374151;
+    font-weight: 600;
+}
+
+/* ── SECURITY CARD (Sidebar) ── */
+.security-card {
+    background: #f0fdf4;
+    border-radius: 20px;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    border: 1px solid #bbf7d0;
+    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.05);
+}
+
+.security-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #166534;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.security-card__text {
+    font-size: 0.82rem;
+    color: #15803d;
+    line-height: 1.5;
+    margin: 0 0 1.25rem;
+}
+
+.security-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.security-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #166534;
+    background: #fff;
+    border: 1px solid #bbf7d0;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+}
+
+.order-card__guarantee {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 0.85rem;
+    border: 1px solid #e2e8f0;
+}
+
+.guarantee-icon {
+    color: #2563eb;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.guarantee-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.guarantee-text strong {
+    font-size: 0.88rem;
+    color: #1e293b;
+    font-weight: 800;
+}
+
+.guarantee-text span {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* ============================================================
+   Suporte a modo escuro no checkout (Sem alterar modo claro)
+   ============================================================ */
+.checkout-scope {
+    --body-bg-rgb: 248, 249, 250;
+    --custom-white: #fff;
+    --custom-black: #000;
+    --default-border: #dee2e6;
+    --default-text-color: #212529;
+    --light-rgb: 248, 249, 250;
+    --form-control-bg: #fff;
+    --input-border: #dee2e6;
+    --default-background: #f0f4f8;
+    --text-muted: #6c757d;
+    color-scheme: light;
+    color: #212529;
+}
+
+[data-theme-mode="dark"] .checkout-scope {
+    color-scheme: dark;
+    color: #f8fafc !important;
+}
+
+[data-theme-mode="dark"] .checkout-page {
+    background: linear-gradient(145deg, #090d16 0%, #0f172a 60%, #090d16 100%) !important;
+}
+
+[data-theme-mode="dark"] .ck-title {
+    color: #ffffff !important;
+}
+
+[data-theme-mode="dark"] .ck-subtitle {
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .ck-block,
+[data-theme-mode="dark"] .order-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme-mode="dark"] .ck-block-title {
+    color: #e2e8f0 !important;
+}
+
+[data-theme-mode="dark"] .plan-card {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+[data-theme-mode="dark"] .plan-card:hover {
+    border-color: #475569 !important;
+}
+
+[data-theme-mode="dark"] .plan-card--selected {
+    background: rgba(37, 99, 235, 0.15) !important;
+    border-color: #3b82f6 !important;
+}
+
+[data-theme-mode="dark"] .plan-card__name {
+    color: #f8fafc !important;
+}
+
+[data-theme-mode="dark"] .plan-card__certs {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .price--period {
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .period-btn {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+[data-theme-mode="dark"] .period-btn:hover {
+    border-color: #475569 !important;
+}
+
+[data-theme-mode="dark"] .period-btn--active {
+    background: rgba(37, 99, 235, 0.15) !important;
+    border-color: #3b82f6 !important;
+}
+
+[data-theme-mode="dark"] .period-btn__label {
+    color: #f8fafc !important;
+}
+
+[data-theme-mode="dark"] .period-btn__price {
+    color: #cbd5e1 !important;
+}
+
+[data-theme-mode="dark"] .pm-tab {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .pm-tab:hover {
+    border-color: #475569 !important;
+    color: #3b82f6 !important;
+}
+
+[data-theme-mode="dark"] .pm-tab--active {
+    background: rgba(37, 99, 235, 0.15) !important;
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+}
+
+[data-theme-mode="dark"] .checkout-scope label,
+[data-theme-mode="dark"] .field-label {
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .checkout-scope input,
+[data-theme-mode="dark"] .checkout-scope select,
+[data-theme-mode="dark"] .checkout-scope .form-control,
+[data-theme-mode="dark"] .checkout-scope .form-select,
+[data-theme-mode="dark"] .form input,
+[data-theme-mode="dark"] .form select,
+[data-theme-mode="dark"] .form .input-form {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+[data-theme-mode="dark"] .checkout-scope input::placeholder,
+[data-theme-mode="dark"] .form input::placeholder {
+    color: #475569 !important;
+}
+
+[data-theme-mode="dark"] .billing-day-btn {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+[data-theme-mode="dark"] .billing-day-btn:hover {
+    border-color: #475569 !important;
+    color: #3b82f6 !important;
+}
+
+[data-theme-mode="dark"] .billing-day-btn--active {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #fff !important;
+}
+
+[data-theme-mode="dark"] .annual-installment-box {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+[data-theme-mode="dark"] .annual-installment-icon {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+}
+
+[data-theme-mode="dark"] .annual-installment-text strong {
+    color: #34d399 !important;
+}
+
+[data-theme-mode="dark"] .annual-installment-text span {
+    color: #a7f3d0 !important;
+}
+
+[data-theme-mode="dark"] .recurrence-info {
+    background: rgba(37, 99, 235, 0.15) !important;
+    color: #3b82f6 !important;
+}
+
+[data-theme-mode="dark"] .pix-instructions {
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .pix-price-badge {
+    background: rgba(37, 99, 235, 0.15) !important;
+    color: #3b82f6 !important;
+}
+
+[data-theme-mode="dark"] .pix-price-badge span {
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .pix-qr-img {
+    border-color: #334155 !important;
+    background: #fff !important;
+}
+
+[data-theme-mode="dark"] .pix-copy-box {
+    border-color: #334155 !important;
+    background: #0f172a !important;
+}
+
+[data-theme-mode="dark"] .pix-code-input {
+    color: #cbd5e1 !important;
+}
+
+[data-theme-mode="dark"] .order-card__plan-name {
+    color: #ffffff !important;
+}
+
+[data-theme-mode="dark"] .order-card__plan-type {
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .order-card__plan-icon {
+    background: #0f172a !important;
+    color: #3b82f6 !important;
+}
+
+[data-theme-mode="dark"] .order-card__divider {
+    border-top-color: #334155 !important;
+}
+
+[data-theme-mode="dark"] .order-benefit {
+    color: #cbd5e1 !important;
+}
+
+[data-theme-mode="dark"] .order-card__guarantee {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+[data-theme-mode="dark"] .guarantee-text strong {
+    color: #f8fafc !important;
+}
+
+[data-theme-mode="dark"] .guarantee-text span {
+    color: #94a3b8 !important;
+}
+
+[data-theme-mode="dark"] .security-card {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+[data-theme-mode="dark"] .security-card__title {
+    color: #34d399 !important;
+}
+
+[data-theme-mode="dark"] .security-card__text {
+    color: #a7f3d0 !important;
+}
+
+[data-theme-mode="dark"] .security-badge {
+    background: #0f172a !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+    color: #34d399 !important;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .checkout-page {
+        padding: 3.5rem 1rem 3rem;
+        /* Aumentado o topo de 1rem para 3.5rem */
+    }
+
+
+    .ck-header {
+        margin-bottom: 2rem !important;
+        text-align: center;
+    }
+
+    .checkout-container {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .checkout-summary-col {
+        display: none !important;
+    }
+
+    .plan-benefits-sm {
+        display: block !important;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px dashed #e2e8f0;
+    }
+
+    .ck-title {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+
+    .ck-block {
+        padding: 1.25rem 1.1rem;
+    }
+
+    .plan-grid {
+        grid-template-columns: 1fr;
+        /* Stack plans on very small screens */
+        gap: 1rem;
+    }
+
+    .period-toggle {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-method-tabs {
+        flex-direction: column;
+    }
+
+    .pm-tab {
+        flex: unset;
+        width: 100%;
+    }
+
+    .order-price__amount {
+        font-size: 1.9rem;
+    }
+
+    .button-payment {
+        flex-direction: column;
+        padding: 0.8rem 1rem;
+        height: auto;
+        gap: 2px;
+        font-size: 1rem;
+    }
+
+    .button-payment svg {
+        display: none;
+        /* Hide icon on mobile to save space if needed, or keep it */
+    }
+
+    .button-payment span {
+        margin-left: 0 !important;
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+}
+
+
+/* ── MISC UTILS (kept from original) ── */
+#validation-error-messages {
+    border: 1px solid transparent;
+}
+
+#validation-error-messages p {
+    color: red;
+    text-align: center;
+    border: 1px solid transparent;
+    margin-bottom: 1rem;
+}
+
+#spinner {
+    border: 1px solid transparent;
+    height: 20px !important;
+}
+
+#error {
+    color: red;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.card-progress {
+    width: 100%;
+    padding: .2rem;
+}
+
+/* ── GLOBAL LAYOUT OVERRIDES (Fix for gray background) ── */
+.main-content:has(.checkout-scope),
+.container-fluid:has(.checkout-scope),
+.app-content:has(.checkout-scope),
+.main-container:has(.checkout-scope),
+.main-content-app:has(.checkout-scope),
+.page:has(.checkout-scope),
+.page-main:has(.checkout-scope),
+body:has(.checkout-scope) {
+    background: linear-gradient(145deg, #eef2ff 0%, #f0f4f8 60%, #e8f4fd 100%) !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+[data-theme-mode="dark"] .main-content:has(.checkout-scope),
+[data-theme-mode="dark"] .container-fluid:has(.checkout-scope),
+[data-theme-mode="dark"] .app-content:has(.checkout-scope),
+[data-theme-mode="dark"] .main-container:has(.checkout-scope),
+[data-theme-mode="dark"] .main-content-app:has(.checkout-scope),
+[data-theme-mode="dark"] .page:has(.checkout-scope),
+[data-theme-mode="dark"] .page-main:has(.checkout-scope),
+[data-theme-mode="dark"] body:has(.checkout-scope) {
+    background: linear-gradient(145deg, #090d16 0%, #0f172a 60%, #090d16 100%) !important;
+}
+
+/* Ensure inner elements are transparent to show the global gradient */
+.checkout-scope .main-content,
+.checkout-scope .container-fluid,
+.checkout-scope .app-content {
+    background: transparent !important;
+}
+
+/* Hide potential top headers/margins that are gray */
+.checkout-scope .header {
+    background: transparent !important;
+    border-bottom: none !important;
+}
+
+/* Target the dashboard header when checkout is active */
+body:has(.checkout-scope) .app-header {
+    background: #eef2ff !important;
+    /* Matches the start of the gradient */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: none !important;
+}
+
+[data-theme-mode="dark"] body:has(.checkout-scope) .app-header {
+    background: #090d16 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Fix for any white background in the main wrapper */
+body:has(.checkout-scope) .main-sidebar-header {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border-bottom: none !important;
+    border-block-end: none !important;
+    border-inline-end: none !important;
+    border-right: none !important;
+}
+
+[data-theme-mode="dark"] body:has(.checkout-scope) .main-sidebar-header {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border-bottom: none !important;
+    border-block-end: none !important;
+    border-inline-end: none !important;
+    border-right: none !important;
+}

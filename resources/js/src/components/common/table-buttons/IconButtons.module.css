@@ -1,0 +1,44 @@
+.editButton, .deleteButton, .showOrderButton {
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    padding: 0; 
+    width: 30px;  
+    height: 30px; 
+}
+
+
+.editButton {
+    background-color: rgba(245, 184, 73, 0.15);
+    color: rgb(245, 184, 73);
+ 
+}
+
+.editButton:hover {
+    background-color: rgba(245, 184, 73, 0.3);
+}
+
+
+.deleteButton {
+    background-color: rgba(245, 66, 71, 0.15);
+    color: rgb(245, 66, 71);
+}
+
+
+.deleteButton:hover {
+    background-color: rgba(245, 66, 71, 0.3);
+}
+
+.showOrderButton {
+    background-color: rgba(2, 141, 196, 0.15);
+    color: rgb(2, 141, 196);
+}
+
+.showOrderButton:hover {
+    background-color: rgba(2, 141, 196, 0.3);
+}
+
+.icon {
+    font-size: 15px;
+}

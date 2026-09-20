@@ -1,0 +1,68 @@
+.stepIndicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    width: 100%; /* O step ocupa a largura total do container */
+  }
+  
+  .steps {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    flex: 1; /* Os steps vão ocupar o espaço de forma igual */
+  }
+  
+  .icon {
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #e9ecef; /* Cor para o passo inativo */
+    color: #6c757d;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .completed .icon {
+    background-color: #540AF5; /* Cor para os passos realizados */
+    color: white;
+  }
+  
+  .active .icon {
+    background-color: #C3B6FF; /* Cor para o passo ativo */
+    color: white;
+  }
+  
+  .step::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -50px;
+    height: 2px;
+    width: 100px;
+    background-color: #e9ecef; /* Cor da linha entre os steps futuros */
+    z-index: -1;
+    transform: translateY(-50%);
+  }
+  
+  .completed::before,
+  .active::before {
+    background-color: #540AF5; /* Linha entre os steps realizados e ativos */
+  }
+  
+  .step:first-child::before {
+    content: none;
+  }
+  

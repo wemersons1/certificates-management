@@ -1,0 +1,172 @@
+{
+
+    "languages":{
+        "ptBr": "Português",
+        "enUs": "English",
+        "es": "Español"
+    },
+
+    "sidebar": {
+        "home": "Home",
+        "dashboard": "Dashboard",
+        "orders": "Orders",
+        "products": "Products",
+        "ads": "Ads",
+        "additional_values": "Additional Values",
+        "integrations": "Integrations",
+        "pricing_spreadsheet": "Pricing Spreadsheet"
+    },
+
+    "page_titles": {
+        "home": "Home",
+        "dashboard": "Dashboard",
+        "orders": "Orders",
+        "products": "Products",
+        "ads": "Ads",
+        "additional_values": "Additional Values",
+        "integrations": "Integrations",
+        "pricing_spreadsheet": "Pricing Spreadsheet",
+        "my_profile": "My Profile",
+        "personal_data": "Personal Data",
+        "plan_management": "Plan Management",
+        "password_change": "Password Change",
+        "store_management": "Store Management",
+        "users": "Users",
+        "plans": "Plans",
+        "plans_benefits": "Plans Benefits",
+        "clients": "Customers"
+    },
+
+    "pages": {
+        "home": {
+            "welcome": "Welcome",
+            "new_update": "New Update!",
+            "new_update_message": "We are working on better performance. New Update V.0.1",
+            "tutorials": "Tutorials",
+            "tutorial_message": "Welcome! Watch the integration tutorial."     
+        },
+        "dashboard": {
+            "overview": "Overview",
+            "total_orders": "Total Orders",
+            "revenue": "Revenue",
+            "costs": "Costs",
+            "marketing": "Marketing",
+            "see_more": "See More",
+            "net_profit": "Net Profit",
+            "predicted_profit": "Predicted Profit",
+            "profit_margin": "Profit Margin",
+            "roi": "ROI",
+            "average_profit": "Profit / Delivered Order",
+            "predicted": "Predicted",
+            "gross_revenue": "Gross Revenue",
+            "cpa": "Cost Per Acquisition",
+            "average_ticket": "Average Ticket",
+            "devolution_average_ticket": "Return Average Ticket",
+            "devolutions": "Returns",
+            "order_report": "Order Report",
+            "pending": "Pending",
+            "delivered": "Delivered",
+            "units": "units",
+            "confirmation": "Confirmation",
+            "shipping": "Shipping",
+            "canceled": "Canceled",
+            "effectiveness": "Effectiveness",
+            "returned": "Returned",
+            "logistics": "Logistics",
+            "confirmed_orders": "Confirmed Orders",
+            "canceled_orders": "Canceled Orders",
+            "pending_confirmation_orders": "Pending Confirmation Orders",
+            "pending_shipping_orders": "Pending Shipping Orders",
+            "average_shipping_cost": "Average Shipping Cost per Order",
+            "delivered_orders": "Delivered Orders",
+            "returned_orders": "Returned Orders",
+            "news_orders": "News",
+            "transit_orders": "In Transit",
+            "news": "News",
+            "states_ranking": "States Ranking",
+            "distribution_companies_ranking": "Carriers Ranking",
+            "income": "Income",
+            "average_amount_earned": "Average Earnings Ticket",
+            "additional_values": "Additional Values",
+            "more_profitable_products": "Most Profitable Products",
+            "more_profitable_states": "Most Profitable States",
+            "total_cost": "Total Costs",
+            "product_cost": "Product Cost",
+            "average_order_cost": "Average Cost per Order",
+            "total_shipping_cost": "Total Shipping Cost",
+            "delivered_shipping_cost": "Delivered Shipping Cost",
+            "devolution_shipping_cost": "Return Shipping Cost",
+            "taxes": "Taxes",
+            "administrative_fee": "Administrative Fee",
+            "total_taxes": "Total Taxes and Fees",
+            "cost_over_revenue": "Cost Over Revenue %",
+            "marketing_investment": "Marketing Investment",
+            "real_cpa": "Real CPA",
+            "predicted_real_cpa": "Predicted Real CPA",
+            "predicted_real_roas": "Predicted Real ROAS",
+            "roas": "ROAS",
+            "real_roas": "Real ROAS",
+            "investment_by_platform": "Investment by Platform"
+        },
+
+        "stores": {
+            "welcome": "Welcome",
+            "select_store": "Select the store you want to access",
+            "currency": "Currency",
+            "setup_store": "Set up store",
+            "setup_new_store": "Set up new store",
+            "logout": "Logout"
+        },
+        "setup": {
+            "title": "Initial Setup",
+            "subtitle": "To proceed, you need to set up a store.",
+            "form_title1": "Store Name and Store Country",
+            "form_subtitle1": "What is the name of your store and in which country is it operating?",
+            "store_name": "Store Name",
+            "store_name_placeholder": "Enter the store name",
+            "store_country_placeholder": "Select the store country",
+            "store_country": "Store Country",
+            "form_title2": "Currency",
+            "form_subtitle2": "Choose the currency you prefer to view the data in.",
+            "currency_placeholder": "Select a currency",
+            "form_title3": "Tax and Administrative Fee",
+            "form_subtitle3": "Enter the tax and administrative fee values.",
+            "tax": "Tax (%)",
+            "administrative_fee": "Administrative Fee (%)"
+        }
+
+    },
+    "components": {
+        "date_filter": {
+            "today": "Today",
+            "yesterday": "Yesterday",
+            "7_days": "7 Days",
+            "30_days": "30 Days",
+            "select_period": "Select Period"
+        },
+
+        "choose_stores": {
+            "manage_stores": "Manage Stores",
+            "manage_stores_message": "Update store information and configure a new store.",
+            "currency": "Currency",
+            "setup_new_store": "Set up new store",
+            "setup_store": "Set up store"
+        }
+    },
+    "buttons": {
+        "register": "Register",
+        "cancel": "Cancel",
+        "forward": "Next",
+        "go_back": "Back",
+        "complete": "Complete",
+        "view_tutorials": "View tutorials"
+
+    },
+
+    "status": {
+        "saving": "Saving..."
+    }
+
+
+        
+ }

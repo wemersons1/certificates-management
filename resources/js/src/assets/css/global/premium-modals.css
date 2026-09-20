@@ -1,0 +1,363 @@
+/* ============================================================
+   PREMIUM MODALS & SWEETALERT2 — Dark & Light Theme Support
+   Imported directly via Vite (no SCSS precompilation needed)
+   ============================================================ */
+
+/* ── Light Mode Tokens ─────────────────────────────────────── */
+:root {
+  --pm-blur: 18px;
+  --pm-transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --pm-bg:             rgba(255, 255, 255, 0.92);
+  --pm-border:         rgba(0, 0, 0, 0.08);
+  --pm-shadow:         0 24px 48px -12px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(0,0,0,0.03);
+  --pm-text:           #0f172a;
+  --pm-subtext:        #475569;
+  --pm-input-bg:       rgba(0, 0, 0, 0.025);
+  --pm-input-border:   rgba(0, 0, 0, 0.1);
+  --pm-active-bg:      rgba(37, 99, 235, 0.09);
+  --pm-active-border:  #2563eb;
+  --pm-active-glow:    rgba(37, 99, 235, 0.18);
+  --pm-cancel-bg:      rgba(0, 0, 0, 0.05);
+  --pm-cancel-text:    #475569;
+}
+
+/* ── Dark Mode Tokens ──────────────────────────────────────── */
+[data-theme-mode="dark"] {
+  --pm-bg:             rgba(16, 20, 32, 0.94);
+  --pm-border:         rgba(255, 255, 255, 0.07);
+  --pm-shadow:         0 24px 64px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.04), 0 0 40px rgba(99, 102, 241, 0.06);
+  --pm-text:           #f1f5f9;
+  --pm-subtext:        #94a3b8;
+  --pm-input-bg:       rgba(255, 255, 255, 0.04);
+  --pm-input-border:   rgba(255, 255, 255, 0.09);
+  --pm-active-bg:      rgba(99, 102, 241, 0.14);
+  --pm-active-border:  #6366f1;
+  --pm-active-glow:    rgba(99, 102, 241, 0.28);
+  --pm-cancel-bg:      rgba(255, 255, 255, 0.06);
+  --pm-cancel-text:    #94a3b8;
+}
+
+/* ================================================================
+   1. BOOTSTRAP MODALS — Premium Glassmorphism
+   ================================================================ */
+
+.modal-content {
+  background: var(--pm-bg) !important;
+  backdrop-filter: blur(var(--pm-blur)) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(var(--pm-blur)) saturate(200%) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--pm-shadow) !important;
+  color: var(--pm-text) !important;
+  overflow: hidden !important;
+}
+
+.modal-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--pm-border) !important;
+  padding: 1.5rem 1.75rem !important;
+}
+
+.modal-header .modal-title,
+.modal-header .h6,
+.modal-header h6 {
+  color: var(--pm-text) !important;
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.modal-header .btn-close {
+  width: 2rem !important;
+  height: 2rem !important;
+  border-radius: 50% !important;
+  background-color: var(--pm-cancel-bg) !important;
+  opacity: 0.75 !important;
+  transition: var(--pm-transition) !important;
+  border: 1px solid var(--pm-border) !important;
+}
+.modal-header .btn-close:hover {
+  opacity: 1 !important;
+  transform: rotate(90deg) !important;
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+.modal-body {
+  padding: 1.75rem !important;
+  color: var(--pm-subtext) !important;
+}
+
+.modal-footer {
+  background: transparent !important;
+  border-top: 1px solid var(--pm-border) !important;
+  padding: 1.25rem 1.75rem !important;
+  gap: 0.75rem !important;
+}
+
+/* Forms inside modals */
+.modal-content .form-control,
+.modal-content .form-select,
+.modal-content textarea.form-control {
+  background: var(--pm-input-bg) !important;
+  border: 1px solid var(--pm-input-border) !important;
+  border-radius: 10px !important;
+  color: var(--pm-text) !important;
+  transition: var(--pm-transition) !important;
+}
+.modal-content .form-control:focus,
+.modal-content .form-select:focus,
+.modal-content textarea.form-control:focus {
+  border-color: var(--pm-active-border) !important;
+  box-shadow: 0 0 0 3px var(--pm-active-glow) !important;
+  background: transparent !important;
+  outline: none !important;
+}
+.modal-content label {
+  color: var(--pm-text) !important;
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* Buttons inside modals */
+.modal-content .btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+  transition: var(--pm-transition) !important;
+}
+.modal-content .btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5) !important;
+  filter: brightness(1.08) !important;
+}
+
+.modal-content .btn-secondary,
+.modal-content .btn-light {
+  background: var(--pm-cancel-bg) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  color: var(--pm-cancel-text) !important;
+  transition: var(--pm-transition) !important;
+}
+.modal-content .btn-secondary:hover,
+.modal-content .btn-light:hover {
+  background: var(--pm-active-bg) !important;
+  color: var(--pm-text) !important;
+}
+
+/* ================================================================
+   2. SWEETALERT2 — Full Premium Overhaul
+   NOTE: We also need JavaScript-level defaults (see swal-defaults.ts)
+   because SweetAlert2 injects confirmButtonColor inline on the button.
+   ================================================================ */
+
+/* Backdrop */
+.swal2-container {
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  background-color: rgba(10, 15, 28, 0.45) !important;
+}
+
+/* Popup card */
+.swal2-popup {
+  background: var(--pm-bg) !important;
+  backdrop-filter: blur(var(--pm-blur)) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(var(--pm-blur)) saturate(200%) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--pm-shadow) !important;
+  padding: 2.75rem 2.25rem 2.25rem !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  max-width: 420px !important;
+  width: 90vw !important;
+}
+
+/* Title */
+.swal2-popup .swal2-title {
+  color: var(--pm-text) !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+  padding: 0 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Body text */
+.swal2-popup .swal2-html-container,
+.swal2-popup .swal2-content {
+  color: var(--pm-subtext) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.65 !important;
+  padding: 0 !important;
+  margin-top: 0.25rem !important;
+}
+
+/* ── Icon — success ────────────────────────────────────────────────────────
+   SweetAlert2 builds the success ring using 5 elements that all receive
+   inline style="background-color: #fff" via JavaScript:
+     • .swal2-success itself (icon container)
+     • .swal2-success-circular-line-left  (left white semicircle)
+     • .swal2-success-circular-line-right (right white semicircle)
+     • .swal2-success-fix                 (rectangular mask / "the scratch")
+     • ::before / ::after pseudo-elements
+   We force all of them transparent so only the teal ring & checkmark show.
+   The JS didOpen handler in main.tsx also removes the inline styles at runtime.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.swal2-popup .swal2-icon.swal2-success,
+.swal2-icon.swal2-success {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Checkmark lines */
+.swal2-popup .swal2-icon.swal2-success [class^=swal2-success-line],
+.swal2-icon.swal2-success [class^=swal2-success-line] {
+  background-color: #10b981 !important;
+}
+
+/* Outer ring */
+.swal2-popup .swal2-icon.swal2-success .swal2-success-ring,
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* The two white semicircles + the masking rectangle — all transparent */
+.swal2-popup .swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-popup .swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-popup .swal2-icon.swal2-success .swal2-success-fix,
+.swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-icon.swal2-success .swal2-success-fix {
+  background: transparent !important;
+  background-color: transparent !important;
+  display: none !important;
+}
+
+/* Pseudo-elements */
+.swal2-popup .swal2-icon.swal2-success::before,
+.swal2-popup .swal2-icon.swal2-success::after,
+.swal2-icon.swal2-success::before,
+.swal2-icon.swal2-success::after {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+
+
+/* Icon — error */
+.swal2-popup .swal2-icon.swal2-error {
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+.swal2-popup .swal2-icon.swal2-error [class^=swal2-x-mark-line] {
+  background-color: #ef4444 !important;
+}
+
+/* Icon — warning */
+.swal2-popup .swal2-icon.swal2-warning {
+  border-color: rgba(245, 158, 11, 0.25) !important;
+  color: #f59e0b !important;
+}
+
+/* Icon — info */
+.swal2-popup .swal2-icon.swal2-info {
+  border-color: rgba(59, 130, 246, 0.25) !important;
+  color: #3b82f6 !important;
+}
+
+/* Actions row */
+.swal2-popup .swal2-actions {
+  margin-top: 2rem !important;
+  gap: 0.6rem !important;
+  flex-wrap: wrap !important;
+}
+
+/* Confirm button — maximum specificity to override inline style */
+.swal2-container .swal2-popup .swal2-actions .swal2-confirm,
+.swal2-popup .swal2-actions .swal2-confirm.swal2-styled,
+button.swal2-confirm.swal2-styled {
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 60%, #3b82f6 100%) !important;
+  background-color: transparent !important; /* force gradient over inline bg-color */
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 100px !important;
+  padding: 0.75rem 2.4rem !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.45), 0 1px 4px rgba(0,0,0,0.2) !important;
+  transition: var(--pm-transition) !important;
+}
+.swal2-container .swal2-popup .swal2-actions .swal2-confirm:hover,
+button.swal2-confirm.swal2-styled:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.6), 0 2px 8px rgba(0,0,0,0.2) !important;
+  filter: brightness(1.12) !important;
+}
+.swal2-container .swal2-popup .swal2-actions .swal2-confirm:focus,
+button.swal2-confirm.swal2-styled:focus {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.35) !important;
+}
+
+/* Cancel button */
+.swal2-container .swal2-popup .swal2-actions .swal2-cancel,
+.swal2-popup .swal2-actions .swal2-cancel.swal2-styled,
+button.swal2-cancel.swal2-styled {
+  background: var(--pm-cancel-bg) !important;
+  background-color: transparent !important;
+  color: var(--pm-cancel-text) !important;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 100px !important;
+  padding: 0.75rem 2rem !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  transition: var(--pm-transition) !important;
+}
+.swal2-container .swal2-popup .swal2-actions .swal2-cancel:hover,
+button.swal2-cancel.swal2-styled:hover {
+  background: var(--pm-active-bg) !important;
+  color: var(--pm-text) !important;
+  border-color: var(--pm-active-border) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Deny button (third option) */
+.swal2-popup .swal2-actions .swal2-deny.swal2-styled {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  border: none !important;
+  border-radius: 100px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35) !important;
+}
+
+/* Input & textarea inside Swal */
+.swal2-popup .swal2-input,
+.swal2-popup .swal2-file,
+.swal2-popup .swal2-textarea {
+  background: var(--pm-input-bg) !important;
+  border: 1px solid var(--pm-input-border) !important;
+  border-radius: 10px !important;
+  color: var(--pm-text) !important;
+  box-shadow: none !important;
+  padding: 0.65rem 1rem !important;
+}
+.swal2-popup .swal2-input:focus,
+.swal2-popup .swal2-textarea:focus {
+  border-color: var(--pm-active-border) !important;
+  box-shadow: 0 0 0 3px var(--pm-active-glow) !important;
+}
+
+/* Fix: remove default orange border on focus for some browsers */
+.swal2-popup .swal2-actions button:focus:not(:focus-visible) {
+  box-shadow: none !important;
+}
