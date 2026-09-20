@@ -19,7 +19,6 @@ import ManualEntryModal from "./ManualEntryModal";
 import './Generate.css';
 import { Input } from "@/src/components/ui/input";
 import If from "@/src/components/common/if/if";
-import WelcomeAssistantModern from "../../WelcomeAssistant";
 import * as XLSX from 'xlsx';
 
 // Interface Definitions (Ajustadas)
@@ -1102,14 +1101,6 @@ const CertificateGeneration: FC = () => {
     }
   };
 
-  const needsCompletion = () => {
-    if (!user) return true;
-    const phone = typeof user.phone === 'string' ? user.phone.trim() : '';
-    const missingPhone = !phone;
-    const missingBusinessSegment = !user?.entity?.business_segment_id;
-    return user?.role?.name === 'Entity' && (missingPhone || missingBusinessSegment);
-  };
-
   const themeMode = isDark ? 'dark' : 'light';
 
   return (
@@ -1124,9 +1115,6 @@ const CertificateGeneration: FC = () => {
       alignItems: 'center',
       justifyContent: 'center'
     }}>
-      {coursesLoaded && allCourses.length === 0 && !loadingCourses && !needsCompletion() && (
-        <WelcomeAssistantModern show={true} />
-      )}
       <style>
         {`
           @keyframes pulse-next {
