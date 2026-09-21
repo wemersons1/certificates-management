@@ -1075,6 +1075,11 @@ class CourseTemplateUploadService
                 static fn (array $match): string => 'font-size:' . round((float) $match[1] * $scaleX, 2) . 'px',
                 $updatedStyle
             );
+            $updatedStyle = (string) preg_replace_callback(
+                '/\bline-height\s*:\s*([\d.]+)px/i',
+                static fn (array $match): string => 'line-height:' . round((float) $match[1] * $scaleY, 2) . 'px',
+                $updatedStyle
+            );
             $updatedStyle = rtrim(trim($updatedStyle), ';') . ';position:absolute;top:' . round($top, 2) . 'px;';
 
             // pdftohtml posiciona os parágrafos pela caixa original do PDF.

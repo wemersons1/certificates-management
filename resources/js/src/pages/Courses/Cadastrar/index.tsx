@@ -43,6 +43,8 @@ interface TextElement {
     textAlign: 'left' | 'center' | 'right' | 'justify';
     width: number; // px
     height?: number; // px
+    lineHeight?: string | number;
+    pdfPositioned?: boolean;
     page?: number;
     type?: 'text' | 'line';
 }
@@ -730,8 +732,10 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 let fontWeight = '500';
                 let fontStyle = 'normal';
                 let textDecoration = 'none';
-                let textAlign: 'left' | 'center' | 'right' | 'justify' = 'center';
+                let textAlign: 'left' | 'center' | 'right' | 'justify' = isImportedParagraph ? 'left' : 'center';
                 let width = isLine ? 150 : 600;
+                let lineHeight: string | number = 1.45;
+                let pdfPositioned = false;
 
                 const leftMatch = styleAttr.match(/left:\s*([\d.]+)%/);
                 const topMatch = styleAttr.match(/top:\s*([\d.]+)%/);
@@ -739,10 +743,13 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 if ((!leftMatch || !topMatch) && (!isImportedParagraph || !topPxMatch)) {
                     return; // Skip structural, phantom, or legacy corrupted containers lacking exact coordinates
                 }
-                if (isImportedParagraph && topPxMatch) {
-                    x = 50;
+                const leftPxMatch = styleAttr.match(/left:\s*([\d.]+)px/i);
+                if (isImportedParagraph && topPxMatch && leftPxMatch) {
+                    const leftPx = parseFloat(leftPxMatch[1]);
+                    x = (leftPx / pageWidth) * 100;
                     y = (parseFloat(topPxMatch[1]) / pageHeight) * 100;
-                    width = Math.round(pageWidth);
+                    width = Math.max(1, Math.round(pageWidth - leftPx));
+                    pdfPositioned = true;
                 } else {
                     x = parseFloat(leftMatch![1]);
                     y = parseFloat(topMatch![1]);
@@ -780,6 +787,9 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                             textAlign = alignVal;
                         }
                     }
+
+                    const lineHeightMatch = effectiveStyle.match(/line-height:\s*([\d.]+px)/i);
+                    if (lineHeightMatch) lineHeight = lineHeightMatch[1];
                 }
 
                 if (!isImportedParagraph) {
@@ -827,6 +837,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     textAlign,
                     width,
                     height,
+                    lineHeight,
+                    pdfPositioned,
                     page: pageNum
                 });
             });
@@ -3219,7 +3231,9 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
             const textDecor = el.textDecoration === 'underline' ? 'text-decoration: underline;' : '';
             const heightStyle = el.height ? `min-height: ${el.height}px; height: auto;` : '';
             const widthStyle = `width: ${el.width}px;`;
-            return `<div style="position: absolute; left: ${el.x}%; top: ${el.y}%; transform: translate(-50%, 0); font-size: ${el.fontSize}px; color: ${el.color}; font-family: '${el.fontFamily}', sans-serif; font-weight: ${el.fontWeight}; ${fontStyle} ${textDecor} text-align: ${el.textAlign}; ${widthStyle} ${heightStyle} line-height: 1.45; margin: 0; padding: 0; white-space: pre-wrap; word-break: break-word;">${el.html ?? el.text}</div>`;
+            const transform = el.pdfPositioned ? 'none' : 'translate(-50%, 0)';
+            const lineHeight = el.lineHeight ?? 1.45;
+            return `<div style="position: absolute; left: ${el.x}%; top: ${el.y}%; transform: ${transform}; font-size: ${el.fontSize}px; color: ${el.color}; font-family: '${el.fontFamily}', sans-serif; font-weight: ${el.fontWeight}; ${fontStyle} ${textDecor} text-align: ${el.textAlign}; ${widthStyle} ${heightStyle} line-height: ${lineHeight}; margin: 0; padding: 0; white-space: pre-wrap; word-break: break-word;">${el.html ?? el.text}</div>`;
 
         }).join('');
 
@@ -4937,7 +4951,9 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                 position: 'absolute',
                                                 left: `${el.x}%`,
                                                 top: `${el.y}%`,
-                                                transform: el.type === 'line' ? 'translate(-50%, -50%)' : 'translate(-50%, 0)',
+                                                transform: el.type === 'line'
+                                                    ? 'translate(-50%, -50%)'
+                                                    : (el.pdfPositioned ? 'none' : 'translate(-50%, 0)'),
                                                 fontSize: `${el.fontSize}px`,
                                                 color: el.color,
                                                 fontFamily: `'${el.fontFamily}', sans-serif`,
@@ -4948,7 +4964,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                 // Use the stored element width so text wraps consistently with the View HTML output.
                                                 width: `${el.width}px`,
                                                 maxWidth: 'none',
-                                                lineHeight: '1.45',
+                                                lineHeight: el.lineHeight ?? '1.45',
                                                 height: el.type === 'line'
                                                     ? `${Math.max(1, el.fontSize || 3)}px`
                                                     : 'fit-content',
@@ -4957,7 +4973,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                 overflow: 'visible',
                                                 whiteSpace: 'pre-wrap',
                                                 cursor: draggingId === el.id ? 'grabbing' : 'grab',
-                                                padding: el.type === 'line' ? '0px' : '0px 4px',
+                                                padding: el.type === 'line' || el.pdfPositioned ? '0px' : '0px 4px',
                                                 borderRadius: el.type === 'line' ? '0px' : '4px',
                                                 userSelect: isEditing ? 'text' : 'none',
                                                 transition: 'border-color 0.15s, box-shadow 0.15s',
