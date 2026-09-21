@@ -280,6 +280,10 @@ class CourseTemplateUploadService
 
             if ($templateHtml !== '' && str_contains($templateHtml, 'id="page1-div"')) {
                 [$frontTemplate, $backTemplate] = $this->splitFrontAndBack($templateHtml);
+                $frontTemplate = $this->convertPdfPageToEditorTemplate($frontTemplate, $orientation);
+                if ($backTemplate !== null) {
+                    $backTemplate = $this->convertPdfPageToEditorTemplate($backTemplate, $orientation);
+                }
             } elseif ($backFrameSrc) {
                 $backTemplate = '<div class="cert-container" style="position: relative; width: 100%; height: 100%;"></div>';
             }
@@ -862,6 +866,93 @@ class CourseTemplateUploadService
             $frontTemplate,
             1
         ) ?? $frontTemplate;
+    }
+
+    private function convertPdfPageToEditorTemplate(string $pageHtml, string $orientation): string
+    {
+        if (! class_exists(\DOMDocument::class) || ! str_contains($pageHtml, 'id="page')) {
+            return $pageHtml;
+        }
+
+        $dom = $this->parseHtmlUtf8($pageHtml);
+        if (! $dom) {
+            return $pageHtml;
+        }
+
+        $xpath = new \DOMXPath($dom);
+        $page = $xpath->query('//div[starts-with(@id, "page") and substring(@id, string-length(@id) - 3) = "-div"]')->item(0);
+        if (! $page instanceof \DOMElement) {
+            return $pageHtml;
+        }
+
+        $pageStyle = (string) $page->getAttribute('style');
+        $sourceWidth = $this->extractPixelsFromStyle($pageStyle, 'width');
+        $sourceHeight = $this->extractPixelsFromStyle($pageStyle, 'height');
+        if ($sourceWidth <= 0 || $sourceHeight <= 0) {
+            return $pageHtml;
+        }
+
+        $isPortrait = strtolower($orientation) === 'portrait';
+        $targetWidth = $isPortrait ? 794.0 : 1123.0;
+        $targetHeight = $isPortrait ? 1123.0 : 794.0;
+        $scaleX = $targetWidth / $sourceWidth;
+        $scaleY = $targetHeight / $sourceHeight;
+        $content = '';
+
+        foreach (iterator_to_array($page->childNodes) as $child) {
+            if (! $child instanceof \DOMElement || ! in_array(strtolower($child->tagName), ['p', 'img', 'div', 'span'], true)) {
+                continue;
+            }
+
+            $style = (string) $child->getAttribute('style');
+            if (preg_match('/\btop\s*:\s*([-+]?\d*\.?\d+)px/i', $style, $topMatch) !== 1) {
+                continue;
+            }
+
+            $top = (float) $topMatch[1] * $scaleY;
+            $left = 0.0;
+            if (preg_match('/\bleft\s*:\s*([-+]?\d*\.?\d+)px/i', $style, $leftMatch) === 1) {
+                $left = (float) $leftMatch[1] * $scaleX;
+            }
+
+            $updatedStyle = (string) preg_replace('/\btop\s*:\s*[^;]+;?/i', '', $style);
+            $updatedStyle = (string) preg_replace('/\bleft\s*:\s*[^;]+;?/i', '', $updatedStyle);
+            $updatedStyle = (string) preg_replace('/\bwidth\s*:\s*[^;]+;?/i', '', $updatedStyle);
+            $updatedStyle = (string) preg_replace('/\bheight\s*:\s*[^;]+;?/i', '', $updatedStyle);
+            $updatedStyle = (string) preg_replace('/\bposition\s*:\s*[^;]+;?/i', '', $updatedStyle);
+            $updatedStyle = (string) preg_replace_callback(
+                '/\bfont-size\s*:\s*([\d.]+)px/i',
+                static fn (array $match): string => 'font-size:' . round((float) $match[1] * $scaleX, 2) . 'px',
+                $updatedStyle
+            );
+            $updatedStyle = rtrim(trim($updatedStyle), ';') . ';position:absolute;top:' . round($top, 2) . 'px;';
+
+            if (strtolower($child->tagName) === 'p') {
+                $updatedStyle .= 'left:0;width:100%;text-align:center;margin:0;padding:0;';
+            } else {
+                $updatedStyle .= 'left:' . round($left, 2) . 'px;';
+                $width = $this->extractPixelsFromStyle($style, 'width');
+                $height = $this->extractPixelsFromStyle($style, 'height');
+                if ($width > 0) {
+                    $updatedStyle .= 'width:' . round($width * $scaleX, 2) . 'px;';
+                }
+                if ($height > 0) {
+                    $updatedStyle .= 'height:' . round($height * $scaleY, 2) . 'px;';
+                }
+            }
+
+            $clone = $child->cloneNode(true);
+            if ($clone instanceof \DOMElement) {
+                $clone->setAttribute('style', $updatedStyle);
+                $content .= $this->saveHtmlUtf8($dom, $clone);
+            }
+        }
+
+        $flexDirection = $isPortrait ? 'column' : 'row';
+        return '<div class="cert-container" style="width:' . $targetWidth . 'px;height:' . $targetHeight . 'px;flex-shrink:0;background-color:#ffffff;position:relative;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;display:flex;flex-direction:' . $flexDirection . ';page-break-after:always;margin-bottom:30px;">'
+            . '<div class="content-side" style="position:relative;padding:0;z-index:2;width:100%;height:100%;">'
+            . $content
+            . '</div></div>';
     }
 
     private function isBase64Image(?string $value): bool
