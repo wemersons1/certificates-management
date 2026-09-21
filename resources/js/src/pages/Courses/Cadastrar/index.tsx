@@ -840,6 +840,27 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     fontWeight = '700';
                 }
 
+                if (pdfPositioned && !hasMeaningfulLineBreak) {
+                    // A single PDF line has no explicit CSS width. Its left coordinate
+                    // is the actual glyph start, so using the remaining page width made
+                    // adjacent runs such as "Ministrante:" and the instructor name
+                    // overlap. Measure the original run with the same typography and
+                    // keep only its natural width as the editable anchor box.
+                    let measuredWidth = 0;
+                    if (typeof document !== 'undefined') {
+                        const measureCanvas = document.createElement('canvas');
+                        const measureContext = measureCanvas.getContext('2d');
+                        if (measureContext) {
+                            measureContext.font = `${fontWeight} ${fontSize}px "${fontFamily}"`;
+                            measuredWidth = measureContext.measureText(text).width;
+                        }
+                    }
+                    if (measuredWidth > 0) {
+                        width = Math.max(1, Math.ceil(measuredWidth + 1));
+                    }
+                    textAlign = 'center';
+                }
+
                 // Create a unique stable ID based on page and index
                 const id = `parsed-${pageNum}-${idx}-${Math.random().toString(36).substr(2, 4)}`;
 
