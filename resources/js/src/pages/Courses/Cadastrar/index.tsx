@@ -898,13 +898,50 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     page: pageNum
                 });
             });
+            // A PDF line can be split into multiple positioned runs solely because
+            // its formatting changes (for example bold "Ministrante:" followed by
+            // regular "Prof. Alberto Ponzo Neto"). Treat those runs as one editable
+            // line; otherwise their independent boxes overlap and the second run can
+            // be clipped by the first one. The nested span keeps each run's weight.
+            const mergedElements: TextElement[] = [];
+            const pageWidthForMerge = pageWidth;
+            parsedElements.forEach((current) => {
+                const previous = mergedElements[mergedElements.length - 1];
+                if (
+                    previous &&
+                    previous.pdfPositioned &&
+                    current.pdfPositioned &&
+                    previous.type === 'text' &&
+                    current.type === 'text' &&
+                    Math.abs(previous.y - current.y) < 0.25 &&
+                    Math.abs(previous.fontSize - current.fontSize) < 0.1 &&
+                    previous.fontFamily === current.fontFamily
+                ) {
+                    const previousRight = (previous.x / 100) * pageWidthForMerge + previous.width;
+                    const currentLeft = (current.x / 100) * pageWidthForMerge;
+                    const gap = currentLeft - previousRight;
+                    if (gap >= -2 && gap <= 8) {
+                        const previousHtml = previous.html ?? previous.text;
+                        const currentHtml = current.html ?? current.text;
+                        previous.html = `${previousHtml}<span style="font-weight:${current.fontWeight};font-style:${current.fontStyle};">${currentHtml}</span>`;
+                        previous.text = `${previous.text}${current.text}`;
+                        previous.width = Math.max(
+                            previous.width,
+                            Math.ceil((currentLeft + current.width) - ((previous.x / 100) * pageWidthForMerge))
+                        );
+                        previous.textAlign = 'left';
+                        continue;
+                    }
+                }
+                mergedElements.push(current);
+            });
             console.info('[Template Trace] parser output', {
                 traceId: templateTraceIdRef.current,
                 pageNum,
-                parsedElements: parsedElements.length,
-                texts: parsedElements.slice(0, 20).map(element => element.text),
+                parsedElements: mergedElements.length,
+                texts: mergedElements.slice(0, 20).map(element => element.text),
             });
-            return parsedElements;
+            return mergedElements;
 
         } catch (e) {
             console.error('[Template Trace] parser failed', {
