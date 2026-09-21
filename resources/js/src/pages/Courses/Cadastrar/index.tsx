@@ -930,10 +930,16 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                         const currentHtml = current.html ?? current.text;
                         previous.html = `${previousHtml}<span style="font-weight:${current.fontWeight};font-style:${current.fontStyle};">${currentHtml}</span>`;
                         previous.text = `${previous.text}${current.text}`;
-                        previous.width = Math.ceil(
-                            Math.max(previousLeft + previous.width, currentLeft + current.width) - previousLeft + 8
-                        );
-                        previous.textAlign = 'left';
+                        const combinedRight = Math.max(previousLeft + previous.width, currentLeft + current.width);
+                        const combinedWidth = Math.ceil(combinedRight - previousLeft + 8);
+                        const combinedCenter = (previousLeft + combinedRight) / 2;
+                        previous.width = combinedWidth;
+                        // The first run's left edge is not the center of the
+                        // composed line. Re-anchor the complete line around the
+                        // original PDF center so the bold prefix and regular name
+                        // remain visually centered as one sentence.
+                        previous.x = ((combinedCenter - (combinedWidth / 2)) / pageWidthForMerge) * 100;
+                        previous.textAlign = 'center';
                         return;
                     }
                 }
