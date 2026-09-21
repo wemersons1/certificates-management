@@ -279,10 +279,11 @@ class CourseTemplateUploadService
             $backTemplate = null;
 
             if ($templateHtml !== '' && str_contains($templateHtml, 'id="page1-div"')) {
+                $pdfTypographyStyles = $this->extractPdfTypographyStyles($templateHtml);
                 [$frontTemplate, $backTemplate] = $this->splitFrontAndBack($templateHtml);
-                $frontTemplate = $this->convertPdfPageToEditorTemplate($frontTemplate, $orientation);
+                $frontTemplate = $this->convertPdfPageToEditorTemplate($frontTemplate, $orientation, $pdfTypographyStyles);
                 if ($backTemplate !== null) {
-                    $backTemplate = $this->convertPdfPageToEditorTemplate($backTemplate, $orientation);
+                    $backTemplate = $this->convertPdfPageToEditorTemplate($backTemplate, $orientation, $pdfTypographyStyles);
                 }
             } elseif ($backFrameSrc) {
                 $backTemplate = '<div class="cert-container" style="position: relative; width: 100%; height: 100%;"></div>';
@@ -868,7 +869,23 @@ class CourseTemplateUploadService
         ) ?? $frontTemplate;
     }
 
-    private function convertPdfPageToEditorTemplate(string $pageHtml, string $orientation): string
+    private function extractPdfTypographyStyles(string $html): string
+    {
+        if (preg_match_all('/<style\b[^>]*>(.*?)<\/style>/is', $html, $matches) < 1) {
+            return '';
+        }
+
+        $styles = [];
+        foreach ($matches[1] as $style) {
+            if (preg_match('/\.ft\d+\s*\{|font-size\s*:/i', $style) === 1) {
+                $styles[] = '<style>' . trim($style) . '</style>';
+            }
+        }
+
+        return implode("\n", array_unique($styles));
+    }
+
+    private function convertPdfPageToEditorTemplate(string $pageHtml, string $orientation, string $pdfTypographyStyles = ''): string
     {
         if (! class_exists(\DOMDocument::class) || ! str_contains($pageHtml, 'id="page')) {
             return $pageHtml;
@@ -949,7 +966,7 @@ class CourseTemplateUploadService
         }
 
         $flexDirection = $isPortrait ? 'column' : 'row';
-        return '<div class="cert-container" style="width:' . $targetWidth . 'px;height:' . $targetHeight . 'px;flex-shrink:0;background-color:#ffffff;position:relative;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;display:flex;flex-direction:' . $flexDirection . ';page-break-after:always;margin-bottom:30px;">'
+        return $pdfTypographyStyles . '<div class="cert-container" style="width:' . $targetWidth . 'px;height:' . $targetHeight . 'px;flex-shrink:0;background-color:#ffffff;position:relative;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;display:flex;flex-direction:' . $flexDirection . ';page-break-after:always;margin-bottom:30px;">'
             . '<div class="content-side" style="position:relative;padding:0;z-index:2;width:100%;height:100%;">'
             . $content
             . '</div></div>';

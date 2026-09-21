@@ -19,11 +19,17 @@ HTML;
         $service = new CourseTemplateUploadService();
         $method = new \ReflectionMethod($service, 'convertPdfPageToEditorTemplate');
         $method->setAccessible(true);
-        $result = (string) $method->invoke($service, $pageHtml, 'landscape');
+        $result = (string) $method->invoke(
+            $service,
+            '<style>.ft01{font-size:62px;font-family:Arial;color:#000000;}</style>' . $pageHtml,
+            'landscape',
+            '<style>.ft01{font-size:62px;font-family:Arial;color:#000000;}</style>'
+        );
 
         $this->assertStringContainsString('class="cert-container"', $result);
         $this->assertStringContainsString('width:1123px;height:794px', $result);
         $this->assertStringContainsString('class="content-side"', $result);
+        $this->assertStringContainsString('.ft01{font-size:62px;font-family:Arial;color:#000000;}', $result);
         $this->assertStringContainsString('top:335.2px;left:0;width:100%;text-align:center', $result);
         $this->assertStringContainsString('data:image/png;base64,qrcode', $result);
         $this->assertStringContainsString('top:622.4px;left:71.08px', $result);
