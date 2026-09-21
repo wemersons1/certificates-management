@@ -33,7 +33,7 @@ HTML;
         $this->assertCount(1, $frames);
         $this->assertStringContainsString('class="cert-container"', $result);
         $this->assertStringContainsString('Jessica Estela', $result);
-        $this->assertStringContainsString('text-align:center', $result);
+        $this->assertStringContainsString('top:335.2px;left:155.48px;', $result);
         $this->assertStringContainsString('data:image/png;base64,qrcode', $result);
     }
 }

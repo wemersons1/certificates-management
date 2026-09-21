@@ -417,7 +417,9 @@ private function injectPrintStyle(string $html, float $widthMm, float $heightMm)
         // Ajusta os trechos principais do certificado (nome do funcionario e curso),
         // removendo espacos NBSP excedentes gerados pelo pdftohtml.
         $html = $this->normalizeHeaderRuns($html);
-        $html = $this->centerPdfTextBlocks($html);
+        // O pdftohtml já fornece a posição exata de cada parágrafo. Não mesclar
+        // linhas com o mesmo top nem trocar left/width por uma caixa centralizada:
+        // PDFs com textos laterais, marcas d'água e rodapés perderiam fidelidade.
         $html = $this->stripUnderlinesFromHtml($html);
 
         return $html;
@@ -523,6 +525,11 @@ private function injectPrintStyle(string $html, float $widthMm, float $heightMm)
         $html = (string) preg_replace('/text-decoration-line\s*:\s*underline\s*;?/iu', '', $html);
 
         return $html;
+    }
+
+    private function isPdfLikeHtml(string $html): bool
+    {
+        return preg_match('/<div[^>]*id="page\d+-div"/i', $html) === 1;
     }
 
     private function normalizeHeaderRuns(string $html): string
@@ -1649,8 +1656,11 @@ PY;
             if (env('APP_ENV') === 'local') {
                 \Illuminate\Support\Facades\Log::info('[Gemini] Desativado em ambiente local. Usando fallback de padrões.');
                 $fallbackHtml = $this->applyMasksByPatternFallback($html);
+                $fallbackHtml = $this->isPdfLikeHtml($fallbackHtml)
+                    ? $fallbackHtml
+                    : $this->convertCenteredAbsoluteToFlexible($fallbackHtml);
                 return $this->removeLineBreaksFromMaskContainers(
-                    $this->convertCenteredAbsoluteToFlexible($fallbackHtml)
+                    $fallbackHtml
                 );
             }
 
@@ -1711,7 +1721,9 @@ PY;
 
             $maskedHtml = $this->restoreCenteredTextAlignment($html, $maskedHtml);
             $maskedHtml = $this->ensureCenteredAlignmentForMaskedBlocks($html, $maskedHtml);
-            $maskedHtml = $this->convertCenteredAbsoluteToFlexible($maskedHtml);
+            if (! $this->isPdfLikeHtml($maskedHtml)) {
+                $maskedHtml = $this->convertCenteredAbsoluteToFlexible($maskedHtml);
+            }
             $maskedHtml = $this->removeLineBreaksFromMaskContainers($maskedHtml);
 
             if (($this->generationMeta['orientation'] ?? null) === null) {
@@ -1726,15 +1738,21 @@ PY;
 
             \Illuminate\Support\Facades\Log::warning('[Gemini] Nenhuma máscara aplicada com sucesso. Ativando fallback de padrões.');
             $fallbackHtml = $this->applyMasksByPatternFallback($html);
+            $fallbackHtml = $this->isPdfLikeHtml($fallbackHtml)
+                ? $fallbackHtml
+                : $this->convertCenteredAbsoluteToFlexible($fallbackHtml);
             return $this->removeLineBreaksFromMaskContainers(
-                $this->convertCenteredAbsoluteToFlexible($fallbackHtml)
+                $fallbackHtml
             );
         } catch (\Throwable $e) {
             $this->warn('Falha ao aplicar mascaras com Gemini: ' . $e->getMessage());
             \Illuminate\Support\Facades\Log::error('[Gemini] ' . $e->getMessage());
             $fallbackHtml = $this->applyMasksByPatternFallback($html);
+            $fallbackHtml = $this->isPdfLikeHtml($fallbackHtml)
+                ? $fallbackHtml
+                : $this->convertCenteredAbsoluteToFlexible($fallbackHtml);
             return $this->removeLineBreaksFromMaskContainers(
-                $this->convertCenteredAbsoluteToFlexible($fallbackHtml)
+                $fallbackHtml
             );
         }
     }

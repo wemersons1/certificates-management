@@ -65,7 +65,9 @@ class CourseTemplateUploadService
             $frontFrameSrc = null;
             $backFrameSrc = null;
             $hasExtractedTemplateFrames = false;
-            $templateHtml = is_file($outputPath) ? (string) file_get_contents($outputPath) : '';
+            $templateFrames = [];
+            $sourceTemplateHtml = is_file($outputPath) ? (string) file_get_contents($outputPath) : '';
+            $templateHtml = $sourceTemplateHtml;
             $this->logImportStep($traceId, 'html_loaded', $this->summarizeHtml($templateHtml));
 
             if ($templateHtml !== '' && str_contains($templateHtml, 'id="page1-div"')) {
@@ -98,7 +100,13 @@ class CourseTemplateUploadService
                 }
             }
 
-            if (! $hasExtractedTemplateFrames && $pdfPath && is_file($pdfPath)) {
+            // Mesmo quando o pdftohtml encontra uma imagem do tamanho da página,
+            // ela pode já conter textos rasterizados (marcas d'água e rodapés).
+            // Nesse caso, usá-la como moldura e renderizar os mesmos textos no HTML
+            // produz duplicação visual. Sempre tente gerar uma moldura limpa a partir
+            // do PDF original; a imagem extraída fica apenas como fallback.
+            $needsCleanPdfFrame = $hasExtractedTemplateFrames && $pdfPath && is_file($pdfPath);
+            if ((! $hasExtractedTemplateFrames || $needsCleanPdfFrame) && $pdfPath && is_file($pdfPath)) {
                 $this->logImportStep($traceId, 'background_fallback_started', ['pdf_path' => $pdfPath]);
                 $noTextPdf = $tmpDir . '/no_text.pdf';
                 
@@ -107,7 +115,9 @@ class CourseTemplateUploadService
                 $success = false;
                 if (!app()->environment('local')) {
                     try {
-                        $originalHtml = is_file($outputPath) ? file_get_contents($outputPath) : null;
+                        // Use o HTML completo, antes da remoção da imagem de página.
+                        // O HTML já sem a imagem não representa o fundo original.
+                        $originalHtml = $sourceTemplateHtml !== '' ? $sourceTemplateHtml : null;
                         if ($originalHtml) {
                             // Determine if it is a multi-page document to prevent empty trailing pages in Playwright rendering
                             $isMultiPage = false;
@@ -206,16 +216,22 @@ class CourseTemplateUploadService
                     \Illuminate\Support\Facades\Log::info('[CourseTemplateUploadService] Ambiente local: pulando Playwright, usando Ghostscript diretamente.');
                 }
 
-                // 2. Fallback: Se o Playwright falhar/não estiver disponível ou for ambiente local, tenta o Ghostscript
+                // 2. Fallback: se o Playwright falhar/não estiver disponível, tenta o Ghostscript.
                 if (! $success) {
                     shell_exec('gs -o ' . escapeshellarg($noTextPdf) . ' -sDEVICE=pdfwrite -dFILTERTEXT ' . escapeshellarg($pdfPath) . ' 2>/dev/null');
+                    $success = is_file($noTextPdf) && filesize($noTextPdf) > 0;
                 }
                 
-                $renderPdf = is_file($noTextPdf) ? $noTextPdf : $pdfPath;
+                // Só rasterizar o PDF se a camada textual tiver sido removida.
+                // Rasterizar o original aqui recria todos os textos na moldura e
+                // volta a causar a duplicação que a importação deve evitar.
+                $renderPdf = is_file($noTextPdf) && filesize($noTextPdf) > 0 ? $noTextPdf : null;
 
                 // Render page prints/rasterizations at 150 DPI
-                shell_exec('pdftoppm -jpeg -r 150 ' . escapeshellarg($renderPdf) . ' ' . escapeshellarg($tmpDir . '/page') . ' 2>/dev/null');
-                $pages = glob($tmpDir . '/page-*.jpg') ?: [];
+                if ($renderPdf !== null) {
+                    shell_exec('pdftoppm -jpeg -r 150 ' . escapeshellarg($renderPdf) . ' ' . escapeshellarg($tmpDir . '/page') . ' 2>/dev/null');
+                }
+                $pages = $renderPdf !== null ? (glob($tmpDir . '/page-*.jpg') ?: []) : [];
                 sort($pages);
                 
                 if ($pages !== []) {
@@ -223,6 +239,11 @@ class CourseTemplateUploadService
                     if (count($pages) > 1) {
                         $backFrameSrc = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($pages[1]));
                     }
+                } elseif ($hasExtractedTemplateFrames) {
+                    // Não descartar uma moldura válida se nenhum renderer limpo
+                    // estiver instalado no ambiente atual.
+                    $frontFrameSrc = $templateFrames[0] ?? $frontFrameSrc;
+                    $backFrameSrc = $templateFrames[1] ?? $backFrameSrc;
                 }
                 $this->logImportStep($traceId, 'background_fallback_finished', [
                     'page_count' => count($pages),
@@ -1056,18 +1077,17 @@ class CourseTemplateUploadService
             );
             $updatedStyle = rtrim(trim($updatedStyle), ';') . ';position:absolute;top:' . round($top, 2) . 'px;';
 
-            if (strtolower($child->tagName) === 'p') {
-                $updatedStyle .= 'left:0;width:100%;text-align:center;margin:0;padding:0;';
-            } else {
-                $updatedStyle .= 'left:' . round($left, 2) . 'px;';
-                $width = $this->extractPixelsFromStyle($style, 'width');
-                $height = $this->extractPixelsFromStyle($style, 'height');
-                if ($width > 0) {
-                    $updatedStyle .= 'width:' . round($width * $scaleX, 2) . 'px;';
-                }
-                if ($height > 0) {
-                    $updatedStyle .= 'height:' . round($height * $scaleY, 2) . 'px;';
-                }
+            // pdftohtml posiciona os parágrafos pela caixa original do PDF.
+            // Não centralizar todos os <p>: isso desloca textos laterais/diagonais
+            // e faz o rodapé sair da área branca do modelo importado.
+            $updatedStyle .= 'left:' . round($left, 2) . 'px;';
+            $width = $this->extractPixelsFromStyle($style, 'width');
+            $height = $this->extractPixelsFromStyle($style, 'height');
+            if ($width > 0) {
+                $updatedStyle .= 'width:' . round($width * $scaleX, 2) . 'px;';
+            }
+            if ($height > 0) {
+                $updatedStyle .= 'height:' . round($height * $scaleY, 2) . 'px;';
             }
 
             $clone = $child->cloneNode(true);
