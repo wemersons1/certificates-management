@@ -1057,6 +1057,14 @@ class CourseTemplateUploadService
             static fn (array $match): string => 'line-height:' . round((float) $match[1] * $scaleY, 2) . 'px',
             $scaledTypographyStyles
         );
+        // pdftohtml exposes subset font names such as AAAAAA+LiberationSans.
+        // Those names are not installed browser families and silently fall back
+        // to a different font with different glyph metrics and line widths.
+        $scaledTypographyStyles = (string) preg_replace(
+            '/\bfont-family\s*:\s*[^;{}]*?\b(?:[A-Z]{6}\+)?LiberationSans\b[^;{}]*/i',
+            'font-family: Liberation Sans',
+            $scaledTypographyStyles
+        );
         $content = '';
 
         foreach (iterator_to_array($page->childNodes) as $child) {

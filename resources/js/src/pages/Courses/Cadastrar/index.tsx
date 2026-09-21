@@ -741,7 +741,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 let fontSize = isLine ? 4 : 16;
                 let color = '#000000';
                 let fontFamily = 'Open Sans';
-                let fontWeight = '500';
+                let fontWeight = '400';
                 let fontStyle = 'normal';
                 let textDecoration = 'none';
                 let textAlign: 'left' | 'center' | 'right' | 'justify' = isImportedParagraph ? 'left' : 'center';
@@ -795,12 +795,16 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     if (colorMatch) color = colorMatch[1];
 
                     const familyMatch = effectiveStyle.match(/font-family:\s*(?:'([^']+)'|([^;,]+))/i);
-                    if (familyMatch) fontFamily = (familyMatch[1] || familyMatch[2]).trim();
+                    if (familyMatch) {
+                        fontFamily = (familyMatch[1] || familyMatch[2]).trim()
+                            .replace(/^[A-Z]{6}\+/i, '')
+                            .replace(/^LiberationSans$/i, 'Liberation Sans');
+                    }
 
                     const weightMatch = effectiveStyle.match(/font-weight:\s*(\w+)/i);
                     if (weightMatch) {
-                        const parsedWeight = weightMatch[1];
-                        fontWeight = ['600', 'bold', '700', '800', '900'].includes(parsedWeight) ? '600' : '500';
+                        const parsedWeight = weightMatch[1].toLowerCase();
+                        fontWeight = parsedWeight === 'bold' ? '700' : parsedWeight;
                     }
 
                     if (effectiveStyle.includes('font-style: italic')) fontStyle = 'italic';
@@ -833,7 +837,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 if (heightMatch && !isLine) height = Math.round(parseFloat(heightMatch[1]));
 
                 if (isImportedParagraph && div.querySelector('b, strong')) {
-                    fontWeight = '600';
+                    fontWeight = '700';
                 }
 
                 // Create a unique stable ID based on page and index
