@@ -417,9 +417,100 @@ private function injectPrintStyle(string $html, float $widthMm, float $heightMm)
         // Ajusta os trechos principais do certificado (nome do funcionario e curso),
         // removendo espacos NBSP excedentes gerados pelo pdftohtml.
         $html = $this->normalizeHeaderRuns($html);
+        $html = $this->centerPdfTextBlocks($html);
         $html = $this->stripUnderlinesFromHtml($html);
 
         return $html;
+    }
+
+    private function centerPdfTextBlocks(string $html): string
+    {
+        if (! class_exists(\DOMDocument::class)) {
+            return $html;
+        }
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        libxml_use_internal_errors(true);
+        $loaded = $dom->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+
+        if (! $loaded) {
+            return $html;
+        }
+
+        $xpath = new \DOMXPath($dom);
+        $pages = $xpath->query('//div[starts-with(@id, "page") and substring(@id, string-length(@id) - 3) = "-div"]');
+
+        if (! $pages instanceof \DOMNodeList || $pages->length === 0) {
+            return $html;
+        }
+
+        foreach ($pages as $page) {
+            if (! $page instanceof \DOMElement) {
+                continue;
+            }
+
+            $pageStyle = (string) $page->getAttribute('style');
+            $pageWidth = 1123.0;
+            if (preg_match('/\bwidth\s*:\s*([\d.]+)px/i', $pageStyle, $widthMatch) === 1) {
+                $pageWidth = max(1.0, (float) $widthMatch[1]);
+            }
+
+            $paragraphsByTop = [];
+            foreach (iterator_to_array($page->childNodes) as $child) {
+                if (! $child instanceof \DOMElement || strtolower($child->tagName) !== 'p') {
+                    continue;
+                }
+
+                $style = (string) $child->getAttribute('style');
+                if (preg_match('/\btop\s*:\s*([-+]?\d*\.?\d+)px/i', $style, $topMatch) !== 1) {
+                    continue;
+                }
+
+                $topKey = (string) round((float) $topMatch[1], 2);
+                $paragraphsByTop[$topKey][] = $child;
+            }
+
+            foreach ($paragraphsByTop as $paragraphs) {
+                if ($paragraphs === []) {
+                    continue;
+                }
+
+                usort($paragraphs, static function (\DOMElement $left, \DOMElement $right): int {
+                    preg_match('/\bleft\s*:\s*([-+]?\d*\.?\d+)px/i', (string) $left->getAttribute('style'), $leftMatch);
+                    preg_match('/\bleft\s*:\s*([-+]?\d*\.?\d+)px/i', (string) $right->getAttribute('style'), $rightMatch);
+                    return ((float) ($leftMatch[1] ?? 0)) <=> ((float) ($rightMatch[1] ?? 0));
+                });
+
+                $target = $paragraphs[0];
+                if (count($paragraphs) > 1) {
+                    $merged = $target->cloneNode(false);
+                    foreach ($paragraphs as $index => $paragraph) {
+                        if ($index > 0) {
+                            $merged->appendChild($dom->createTextNode(' '));
+                        }
+                        foreach (iterator_to_array($paragraph->childNodes) as $child) {
+                            $merged->appendChild($child->cloneNode(true));
+                        }
+                    }
+                    $target->parentNode?->replaceChild($merged, $target);
+                    $target = $merged;
+                    foreach (array_slice($paragraphs, 1) as $paragraph) {
+                        $paragraph->parentNode?->removeChild($paragraph);
+                    }
+                }
+
+                $style = (string) $target->getAttribute('style');
+                $style = (string) preg_replace('/\bleft\s*:\s*[^;]+;?/i', '', $style);
+                $style = (string) preg_replace('/\bwidth\s*:\s*[^;]+;?/i', '', $style);
+                $style = (string) preg_replace('/\btext-align\s*:\s*[^;]+;?/i', '', $style);
+                $style = rtrim(trim($style), ';') . ';';
+                $style .= 'left:0;width:' . rtrim(rtrim(number_format($pageWidth, 2, '.', ''), '0'), '.') . 'px;text-align:center;';
+                $target->setAttribute('style', $style);
+            }
+        }
+
+        return $dom->saveHTML() ?: $html;
     }
 
     private function stripUnderlinesFromHtml(string $html): string

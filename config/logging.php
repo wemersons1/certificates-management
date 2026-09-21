@@ -65,6 +65,14 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'course_template_import' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/course-template-import.log'),
+            'level' => 'debug',
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
