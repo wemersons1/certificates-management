@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Str;
+use App\Services\Files\R2Path;
 
 class ImageController extends Controller
 {
@@ -16,15 +16,8 @@ class ImageController extends Controller
         // 1. Extraímos apenas o caminho relativo da URL
         // Se vier "https://bucket.s3.region.amazonaws.com/frames/logo.webp"
         // parse_url retornará "/frames/logo.webp"
-        $path = parse_url($input, PHP_URL_PATH);
-
-        // 2. Removemos a barra inicial (/) se houver, para o Storage::disk encontrar
-        $path = ltrim($path, '/');
-
-        // Opcional: Se o nome do seu bucket estiver no meio da URL (estilo antigo), 
-        // podemos garantir que ele seja removido também:
-        $bucketName = config('filesystems.disks.s3.bucket');
-        $path = Str::replaceFirst($bucketName . '/', '', $path);
+        // O disk já aplica o diretório raiz; remova prefixos que vieram na URL ou no banco.
+        $path = R2Path::normalize($input);
 
         if (Storage::disk('s3')->exists($path)) {
             $file = Storage::disk('s3')->get($path);

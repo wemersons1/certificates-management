@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Services\Files\R2Path;
 
 class DocumentTemplateFrame extends Model
 {
@@ -68,7 +69,7 @@ class DocumentTemplateFrame extends Model
             return null;
         }
 
-        $path = ltrim(parse_url($framePath, PHP_URL_PATH) ?? $framePath, '/');
+        $path = R2Path::normalize($framePath);
 
         if (!Storage::disk('s3')->exists($path)) {
             return null;

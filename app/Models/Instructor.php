@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Services\Files\R2Path;
 
 class Instructor extends Model
 {
@@ -44,8 +45,7 @@ class Instructor extends Model
                     return null;
                 }
 
-                $path = parse_url($this->stamp, PHP_URL_PATH); // remove domínio
-                $path = ltrim($path, '/');
+                $path = R2Path::normalize($this->stamp);
 
                 if (!Storage::disk('s3')->exists($path)) {
                     return null;
@@ -73,8 +73,7 @@ class Instructor extends Model
                     return null;
                 }
 
-                $path = parse_url($this->signature, PHP_URL_PATH); // remove domínio
-                $path = ltrim($path, '/');
+                $path = R2Path::normalize($this->signature);
 
                 if (!Storage::disk('s3')->exists($path)) {
                     return null;

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
+use App\Services\Files\R2Path;
 
 class DocumentAttachmentController extends Controller
 {
@@ -18,15 +19,16 @@ class DocumentAttachmentController extends Controller
         try {
             // Localiza o anexo
             $attachment = DocumentAttachment::findOrFail($id);
+            $filePath = R2Path::normalize($attachment->file_path);
             
             // Verifica se o arquivo existe no storage
-            if (!Storage::disk('s3')->exists($attachment->file_path)) {
+            if (!Storage::disk('s3')->exists($filePath)) {
                 return response()->json(['message' => 'Arquivo não encontrado no storage'], 404);
             }
             
             // Método 1: Para arquivos menores
             if ($attachment->file_size < 10 * 1024 * 1024) { // Se for menor que 10MB
-                $fileContents = Storage::disk('s3')->get($attachment->file_path);
+                $fileContents = Storage::disk('s3')->get($filePath);
                 
                 return response($fileContents)
                     ->header('Content-Type', $attachment->mime_type)
@@ -40,7 +42,7 @@ class DocumentAttachmentController extends Controller
             else {
                 // Gera uma URL temporária de download direto do S3
                 $tempUrl = Storage::disk('s3')->temporaryUrl(
-                    $attachment->file_path,
+                    $filePath,
                     now()->addMinutes(5), // válido por 5 minutos
                     [
                         'ResponseContentType' => $attachment->mime_type,
@@ -69,9 +71,10 @@ class DocumentAttachmentController extends Controller
         
         // Localiza o anexo
         $attachment = DocumentAttachment::findOrFail($id);
+        $filePath = R2Path::normalize($attachment->file_path);
         
         // Verifica se o arquivo existe no storage
-        if (!Storage::disk('s3')->exists($attachment->file_path)) {
+        if (!Storage::disk('s3')->exists($filePath)) {
             return response()->json(['message' => 'Arquivo não encontrado no storage'], 404);
         }
         
@@ -81,7 +84,7 @@ class DocumentAttachmentController extends Controller
             
             // Gera uma URL temporária assinada
             $url = Storage::disk('s3')->temporaryUrl(
-                $attachment->file_path,
+                $filePath,
                 $expirationTime,
                 [
                     'ResponseContentType' => $attachment->mime_type,
@@ -99,4 +102,4 @@ class DocumentAttachmentController extends Controller
             return response()->json(['message' => 'Erro ao gerar URL de compartilhamento: ' . $e->getMessage()], 500);
         }
     }
-} 
+}

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Services\Files\R2Path;
 
 class CourseFile extends Model
 {
@@ -33,6 +34,6 @@ class CourseFile extends Model
         if (str_starts_with($this->path, 'http://') || str_starts_with($this->path, 'https://')) {
             return $this->path;
         }
-        return Storage::disk('s3')->url($this->path);
+        return Storage::disk('s3')->url(R2Path::normalize($this->path));
     }
 }

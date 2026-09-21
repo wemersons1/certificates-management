@@ -4,6 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Services\Files\R2Path;
 
 class EntityConfig extends Model
 {
@@ -22,8 +23,7 @@ class EntityConfig extends Model
                     return null;
                 }
 
-                $path = parse_url($this->logo, PHP_URL_PATH); // remove domínio
-                $path = ltrim($path, '/');
+                $path = R2Path::normalize($this->logo);
 
                 if (!Storage::disk('s3')->exists($path)) {
                     return null;

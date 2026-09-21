@@ -8,12 +8,10 @@ class DeleteFileS3Service
 {
     public function execute($pathName)
     {
-        $oldPath = parse_url($pathName, PHP_URL_PATH);
-        $oldPath = ltrim($oldPath, '/');
+        $oldPath = R2Path::normalize($pathName);
 
         if (Storage::disk('s3')->exists($oldPath)) {
             Storage::disk('s3')->delete($oldPath);
         }
     }
 }
-

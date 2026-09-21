@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\Files\R2Path;
 
 class BuildTemplate
 {
@@ -159,12 +160,7 @@ class BuildTemplate
         }
 
         try {
-            $path = ltrim(parse_url($url, PHP_URL_PATH), '/');
-
-            $bucketName = config('filesystems.disks.s3.bucket');
-            if (Str::startsWith($path, $bucketName)) {
-                $path = Str::replaceFirst($bucketName . '/', '', $path);
-            }
+            $path = R2Path::normalize($url);
 
             if (Storage::disk('s3')->exists($path)) {
                 $fileContent = Storage::disk('s3')->get($path);

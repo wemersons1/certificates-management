@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\DocumentTemplate;
 use App\Services\Template\CourseTemplateUploadService;
 use Illuminate\Http\Request;
+use App\Services\Files\R2Path;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CourseController extends Controller
@@ -259,12 +260,6 @@ class CourseController extends Controller
 
     private function getRelativeS3Path(string $path): string
     {
-        if (str_contains($path, 'courses/attachments/')) {
-            $pos = strpos($path, 'courses/attachments/');
-            if ($pos !== false) {
-                return substr($path, $pos);
-            }
-        }
-        return $path;
+        return R2Path::normalize($path);
     }
 }
