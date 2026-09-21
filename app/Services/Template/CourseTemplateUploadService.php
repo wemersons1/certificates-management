@@ -1095,13 +1095,13 @@ class CourseTemplateUploadService
             // editor-wide CSS and mask replacement cannot restore the source PDF
             // font size after import.
             $classAttribute = (string) $child->getAttribute('class');
-            if ($pdfTypographyStyles !== '' && $classAttribute !== '') {
+            if ($scaledTypographyStyles !== '' && $classAttribute !== '') {
                 foreach (preg_split('/\s+/', trim($classAttribute)) ?: [] as $className) {
                     if ($className === '') {
                         continue;
                     }
                     $classPattern = '/\.' . preg_quote($className, '/') . '\s*\{([^}]*)\}/i';
-                    if (preg_match($classPattern, $pdfTypographyStyles, $classMatch) !== 1) {
+                    if (preg_match($classPattern, $scaledTypographyStyles, $classMatch) !== 1) {
                         continue;
                     }
                     $classDeclarations = $classMatch[1];

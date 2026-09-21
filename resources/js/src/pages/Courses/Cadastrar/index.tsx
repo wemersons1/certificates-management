@@ -6203,10 +6203,10 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                         fontWeight: 'inherit',
                                                         fontStyle: 'inherit',
                                                         textAlign: el.textAlign,
-                                                        lineHeight: '1',
+                                                        lineHeight: 'inherit',
                                                         overflow: 'hidden',
-                                                        whiteSpace: 'pre-wrap',
-                                                        wordBreak: 'break-word',
+                                                        whiteSpace: el.pdfPositioned ? 'pre' : 'pre-wrap',
+                                                        wordBreak: el.pdfPositioned ? 'normal' : 'break-word',
                                                         cursor: 'text'
                                                     }}
                                                 />
@@ -6215,9 +6215,9 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                     ? <div
                                                         dangerouslySetInnerHTML={{ __html: el.html }}
                                                         style={{
-                                                            whiteSpace: 'pre-wrap',
-                                                            wordBreak: 'break-word',
-                                                            lineHeight: '1',
+                                                            whiteSpace: el.pdfPositioned ? 'pre' : 'pre-wrap',
+                                                            wordBreak: el.pdfPositioned ? 'normal' : 'break-word',
+                                                            lineHeight: 'inherit',
                                                             overflow: 'hidden',
                                                         }}
                                                     />
