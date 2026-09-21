@@ -264,6 +264,7 @@ class CourseTemplateUploadService
             $entityId = $this->resolveEntityId();
             
             $frame = $this->resolveFrameForTemplates($frontFrameSrc, $backFrameSrc);
+   
             $documentTemplate = null;
             $course = null;
             $existingCourse = null;
@@ -638,6 +639,7 @@ class CourseTemplateUploadService
             return DocumentTemplateFrame::query()->myScope()->first();
         }
 
+        
         try {
             // Passa o base64 diretamente para o model.
             // O observer (boot) de DocumentTemplateFrame chama RegisterFilesS3Service,
@@ -654,7 +656,7 @@ class CourseTemplateUploadService
         } catch (\Throwable) {
             // Em caso de falha no cadastro da moldura detectada, usa fallback padrão.
         }
-
+        
         return DocumentTemplateFrame::query()->myScope()->first();
     }
 
