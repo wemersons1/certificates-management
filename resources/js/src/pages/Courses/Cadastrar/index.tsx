@@ -722,6 +722,13 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 // Preserve the full innerHTML so nested tags (e.g. <div>Subitem</div>, <strong>, <br>) render correctly
                 const innerHtml = !isLine ? (div.innerHTML?.trim() || '') : '';
                 const hasNestedTags = innerHtml !== text;
+                // pdftohtml emits a trailing <br> for many single-line PDF paragraphs.
+                // Ignore that trailing marker when deciding whether the paragraph is a
+                // real multi-line column/list.
+                const contentWithoutTrailingBreak = innerHtml
+                    .replace(/(?:<br\s*\/?>|&nbsp;|\u00a0|\s)+$/i, '')
+                    .trim();
+                const hasMeaningfulLineBreak = /<br\s*\/?>/i.test(contentWithoutTrailingBreak);
 
                 if (!isLine && text === undefined) return;
 
@@ -750,7 +757,15 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     const leftPx = parseFloat(leftPxMatch[1]);
                     x = (leftPx / pageWidth) * 100;
                     y = (parseFloat(topPxMatch[1]) / pageHeight) * 100;
-                    width = Math.max(1, Math.round(pageWidth - leftPx));
+                    if (!hasMeaningfulLineBreak) {
+                        // A single-line PDF paragraph is positioned by its left edge,
+                        // not by a CSS text box. Create a symmetric box so replacements
+                        // (for example a user-name mask) remain centered on the same axis.
+                        width = Math.max(1, Math.round(pageWidth - (leftPx * 2)));
+                        textAlign = 'center';
+                    } else {
+                        width = Math.max(1, Math.round(pageWidth - leftPx));
+                    }
                     pdfPositioned = true;
                 } else if (isPersistedPdfElement && leftMatch && topMatch) {
                     // Exported templates are stored as divs with percentage positions.
@@ -803,6 +818,11 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 if (!isImportedParagraph) {
                     const widthMatch = styleAttr.match(/width:\s*([\d.]+)px/);
                     if (widthMatch) width = Math.round(parseFloat(widthMatch[1]));
+                    if (isPersistedPdfElement && !hasMeaningfulLineBreak) {
+                        const leftPx = (x / 100) * pageWidth;
+                        width = Math.max(1, Math.round(pageWidth - (leftPx * 2)));
+                        textAlign = 'center';
+                    }
                 }
 
                 let height: number | undefined = undefined;
