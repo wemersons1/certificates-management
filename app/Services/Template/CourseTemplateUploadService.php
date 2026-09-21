@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -20,6 +21,7 @@ class CourseTemplateUploadService
 {
     public function handle(UploadedFile $uploadedFile, ?int $courseId = null): array
     {
+        $traceId = (string) Str::uuid();
         $tmpDir = storage_path('app/tmp/course-template-import/' . (string) Str::uuid());
         if (! is_dir($tmpDir)) {
             mkdir($tmpDir, 0755, true);
@@ -30,12 +32,28 @@ class CourseTemplateUploadService
         $outputPath = $tmpDir . '/generated-template.html';
         $metaOutputPath = $tmpDir . '/generated-template.meta.json';
 
+        $this->logImportStep($traceId, 'start', [
+            'course_id' => $courseId,
+            'original_name' => $uploadedFile->getClientOriginalName(),
+            'extension' => strtolower((string) $uploadedFile->getClientOriginalExtension()),
+            'size_bytes' => $uploadedFile->getSize(),
+            'environment' => app()->environment(),
+        ]);
+
         try {
             $uploadedFile->move($tmpDir, basename($inputPath));
+            $this->logImportStep($traceId, 'input_saved', ['path' => $inputPath]);
             $normalizedInputPath = $this->normalizeInputForCommand($inputPath, $extension, $tmpDir);
+            $this->logImportStep($traceId, 'input_normalized', ['path' => $normalizedInputPath]);
 
             // Call standard generation command (which does heavy conversion and triggers mocks in tests)
             $exitCode = $this->callGenerateCertificateHtml($normalizedInputPath, $outputPath, $metaOutputPath);
+            $this->logImportStep($traceId, 'html_generation_finished', [
+                'exit_code' => $exitCode,
+                'output_exists' => is_file($outputPath),
+                'output_bytes' => is_file($outputPath) ? filesize($outputPath) : 0,
+                'meta_exists' => is_file($metaOutputPath),
+            ]);
 
             if ($exitCode !== 0 || ! is_file($outputPath)) {
                 throw new RuntimeException('Nao foi possivel gerar o HTML do certificado a partir do arquivo enviado.');
@@ -48,12 +66,21 @@ class CourseTemplateUploadService
             $backFrameSrc = null;
             $hasExtractedTemplateFrames = false;
             $templateHtml = is_file($outputPath) ? (string) file_get_contents($outputPath) : '';
+            $this->logImportStep($traceId, 'html_loaded', $this->summarizeHtml($templateHtml));
 
             if ($templateHtml !== '' && str_contains($templateHtml, 'id="page1-div"')) {
                 [$templateHtml, $templateFrames] = $this->extractPdfFramesAndRemoveFromTemplate($templateHtml);
                 $frontFrameSrc = $templateFrames[0] ?? null;
                 $backFrameSrc = $templateFrames[1] ?? null;
                 $hasExtractedTemplateFrames = $frontFrameSrc !== null;
+
+                $this->logImportStep($traceId, 'pdf_background_extracted', [
+                    'frame_count' => count($templateFrames),
+                    'front_frame_bytes' => $frontFrameSrc !== null ? strlen($frontFrameSrc) : 0,
+                    'back_frame_bytes' => $backFrameSrc !== null ? strlen($backFrameSrc) : 0,
+                    'html_after_bytes' => strlen($templateHtml),
+                    'paragraph_count' => substr_count($templateHtml, '<p'),
+                ]);
 
                 if ($hasExtractedTemplateFrames) {
                     file_put_contents($outputPath, $templateHtml);
@@ -72,6 +99,7 @@ class CourseTemplateUploadService
             }
 
             if (! $hasExtractedTemplateFrames && $pdfPath && is_file($pdfPath)) {
+                $this->logImportStep($traceId, 'background_fallback_started', ['pdf_path' => $pdfPath]);
                 $noTextPdf = $tmpDir . '/no_text.pdf';
                 
                 // 1. Em ambiente local pula o Playwright (timeout de 15s) e vai direto ao Ghostscript.
@@ -196,10 +224,20 @@ class CourseTemplateUploadService
                         $backFrameSrc = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($pages[1]));
                     }
                 }
+                $this->logImportStep($traceId, 'background_fallback_finished', [
+                    'page_count' => count($pages),
+                    'front_frame_bytes' => $frontFrameSrc !== null ? strlen($frontFrameSrc) : 0,
+                    'back_frame_bytes' => $backFrameSrc !== null ? strlen($backFrameSrc) : 0,
+                ]);
             }
 
             $generationMeta = $this->loadGenerationMeta($metaOutputPath);
             $maskValues = (array) data_get($generationMeta, 'mask_values', []);
+            $this->logImportStep($traceId, 'metadata_loaded', [
+                'meta_keys' => array_keys($generationMeta),
+                'mask_keys' => array_keys($maskValues),
+                'orientation' => data_get($generationMeta, 'orientation'),
+            ]);
 
             // 1. Instancia o GeminiService e faz a extração de metadados a partir do HTML original
             $extractedData = [];
@@ -229,11 +267,23 @@ class CourseTemplateUploadService
                     if (is_array($decoded)) {
                         $extractedData = $decoded;
                     }
+                    $this->logImportStep($traceId, 'ai_metadata_extracted', [
+                        'keys' => array_keys($extractedData),
+                        'values_present' => array_map(
+                            static fn ($value): bool => $value !== null && trim((string) $value) !== '',
+                            $extractedData
+                        ),
+                    ]);
                 } elseif ($originalHtml) {
                     \Illuminate\Support\Facades\Log::info('[Gemini Import Extraction] Ignorando extração de metadados via Gemini em ambiente local.');
+                    $this->logImportStep($traceId, 'ai_metadata_skipped_local');
                 }
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::error('[Gemini Import Extraction] Falha ao extrair metadados via Gemini: ' . $e->getMessage());
+                $this->logImportStep($traceId, 'ai_metadata_failed', [
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                ], 'error');
             }
 
             // 2. Resolve e enriquece o nome do curso priorizando a extração do Gemini
@@ -256,6 +306,13 @@ class CourseTemplateUploadService
             $modality = $this->extractModalityFromFilename($uploadedFile->getClientOriginalName());
             $courseCity = trim((string) ($maskValues['{{cidade_de_realizacao}}'] ?? ''));
             $courseName = $this->enrichCourseNameWithSignals($courseName, $modality, $courseCity);
+            $this->logImportStep($traceId, 'course_data_resolved', [
+                'course_name' => $courseName,
+                'hours' => $hours,
+                'orientation' => $orientation,
+                'modality' => $modality,
+                'city_present' => $courseCity !== '',
+            ]);
 
             // 4. Popula maskValues com os dados do instrutor extraídos do Gemini para upsert
             $extractedInstrutor = trim((string) ($extractedData['nome_instrutor'] ?? ''));
@@ -299,6 +356,15 @@ class CourseTemplateUploadService
                     $orientation
                 );
             }
+
+            $this->logImportStep($traceId, 'template_payload_ready', [
+                'template_bytes' => strlen($frontTemplate),
+                'template_paragraph_count' => substr_count($frontTemplate, '<p'),
+                'template_has_cert_container' => str_contains($frontTemplate, 'cert-container'),
+                'template_has_content_side' => str_contains($frontTemplate, 'content-side'),
+                'template_has_positioned_text' => preg_match('/position:\s*absolute/i', $frontTemplate) === 1,
+                'back_template_bytes' => $backTemplate !== null ? strlen($backTemplate) : 0,
+            ]);
 
             $usedMasks = $this->collectUsedMasks($frontTemplate . "\n" . ($backTemplate ?? ''));
             $entityId = $this->resolveEntityId();
@@ -472,6 +538,17 @@ class CourseTemplateUploadService
 
             $instructor = $this->upsertInstructorFromMaskValues($entityId, $maskValues);
 
+            $this->logImportStep($traceId, 'persisted', [
+                'course_id' => $course?->id,
+                'document_template_id' => $documentTemplate?->id,
+                'version_id' => $targetVersion?->id,
+                'course_name' => $course?->name,
+                'course_hours' => $course?->number_of_hours_studied,
+                'template_bytes' => strlen((string) $targetVersion?->template),
+                'instructor_id' => $instructor?->id,
+                'was_updated' => $wasUpdated,
+            ]);
+
             return [
                 'message' => $wasUpdated
                     ? 'Template importado e curso existente atualizado com sucesso.'
@@ -483,6 +560,7 @@ class CourseTemplateUploadService
                 'frame_url' => ($frame && !str_starts_with((string) ($frame->frame ?? ''), 'data:')) ? $frame->frame : null,
                 'back_frame_url' => ($frame && !str_starts_with((string) ($frame->back_frame ?? ''), 'data:')) ? $frame->back_frame : null,
                 'instructor' => $instructor,
+                'trace_id' => $traceId,
                 'used_masks' => $usedMasks,
                 'extracted' => [
                     'course' => [
@@ -500,9 +578,43 @@ class CourseTemplateUploadService
                     'mask_values' => $maskValues,
                 ],
             ];
+        } catch (\Throwable $e) {
+            $this->logImportStep($traceId, 'failed', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ], 'error');
+            throw $e;
         } finally {
+            $this->logImportStep($traceId, 'cleanup', ['tmp_dir' => $tmpDir]);
             $this->cleanupDirectory($tmpDir);
         }
+    }
+
+    private function logImportStep(string $traceId, string $step, array $context = [], string $level = 'info'): void
+    {
+        try {
+            Log::channel('course_template_import')->{$level}('course_template_import', array_merge([
+                'trace_id' => $traceId,
+                'step' => $step,
+            ], $context));
+        } catch (\Throwable) {
+            // O rastreamento nunca pode interromper a importação.
+        }
+    }
+
+    private function summarizeHtml(string $html): array
+    {
+        return [
+            'bytes' => strlen($html),
+            'has_page_container' => str_contains($html, 'page1-div'),
+            'has_word_section' => str_contains($html, 'WordSection'),
+            'has_cert_container' => str_contains($html, 'cert-container'),
+            'paragraph_count' => substr_count($html, '<p'),
+            'image_count' => substr_count($html, '<img'),
+            'style_count' => substr_count($html, '<style'),
+        ];
     }
 
     private function normalizeInputForCommand(string $inputPath, string $extension, string $tmpDir): string
