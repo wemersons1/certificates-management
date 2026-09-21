@@ -14,7 +14,7 @@ class RegisterFilesS3Service
         $base64Data = base64_decode($base64Data);
         // Gera um nome único
         $fileName = "$path/" . uniqid('logo_', true) . '.' . $extension;
-
+  
         // Salva no S3
         Storage::disk('s3')->put($fileName, $base64Data, 'private');
         return Storage::disk('s3')->url($fileName); // ou apenas $fileName se quiser salvar só o path
