@@ -824,7 +824,9 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
 
                 if (!isImportedParagraph) {
                     const widthMatch = styleAttr.match(/width:\s*([\d.]+)px/);
-                    if (widthMatch) width = Math.round(parseFloat(widthMatch[1]));
+                    if (widthMatch && (!isPersistedPdfElement || hasMeaningfulLineBreak)) {
+                        width = Math.round(parseFloat(widthMatch[1]));
+                    }
                     if (isPersistedPdfElement && !hasMeaningfulLineBreak) {
                         const leftPx = (x / 100) * pageWidth;
                         width = Math.max(1, Math.round(pageWidth - (leftPx * 2)));
@@ -917,17 +919,19 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     Math.abs(previous.fontSize - current.fontSize) < 0.1 &&
                     previous.fontFamily === current.fontFamily
                 ) {
-                    const previousRight = (previous.x / 100) * pageWidthForMerge + previous.width;
+                    const previousLeft = (previous.x / 100) * pageWidthForMerge;
                     const currentLeft = (current.x / 100) * pageWidthForMerge;
-                    const gap = currentLeft - previousRight;
-                    if (gap >= -2 && gap <= 8) {
+                    // Persisted templates may still contain the old artificial
+                    // width, so compare the actual run origins rather than that
+                    // stale box when deciding whether two runs share one line.
+                    const runDistance = currentLeft - previousLeft;
+                    if (runDistance >= -2 && runDistance <= previous.width + 12) {
                         const previousHtml = previous.html ?? previous.text;
                         const currentHtml = current.html ?? current.text;
                         previous.html = `${previousHtml}<span style="font-weight:${current.fontWeight};font-style:${current.fontStyle};">${currentHtml}</span>`;
                         previous.text = `${previous.text}${current.text}`;
-                        previous.width = Math.max(
-                            previous.width,
-                            Math.ceil((currentLeft + current.width) - ((previous.x / 100) * pageWidthForMerge))
+                        previous.width = Math.ceil(
+                            Math.max(previousLeft + previous.width, currentLeft + current.width) - previousLeft + 8
                         );
                         previous.textAlign = 'left';
                         return;
