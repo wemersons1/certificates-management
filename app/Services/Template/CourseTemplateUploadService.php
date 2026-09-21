@@ -1090,6 +1090,30 @@ class CourseTemplateUploadService
                 static fn (array $match): string => 'line-height:' . round((float) $match[1] * $scaleY, 2) . 'px',
                 $updatedStyle
             );
+            // pdftohtml stores the typography in .ftXX classes rather than in the
+            // paragraph's inline style. Copy the scaled values inline as well so
+            // editor-wide CSS and mask replacement cannot restore the source PDF
+            // font size after import.
+            $classAttribute = (string) $child->getAttribute('class');
+            if ($pdfTypographyStyles !== '' && $classAttribute !== '') {
+                foreach (preg_split('/\s+/', trim($classAttribute)) ?: [] as $className) {
+                    if ($className === '') {
+                        continue;
+                    }
+                    $classPattern = '/\.' . preg_quote($className, '/') . '\s*\{([^}]*)\}/i';
+                    if (preg_match($classPattern, $pdfTypographyStyles, $classMatch) !== 1) {
+                        continue;
+                    }
+                    $classDeclarations = $classMatch[1];
+                    if (preg_match('/\bfont-size\s*:\s*([\d.]+)px/i', $classDeclarations, $fontMatch) === 1) {
+                        $updatedStyle .= 'font-size:' . round((float) $fontMatch[1] * $scaleX, 2) . 'px;';
+                    }
+                    if (preg_match('/\bline-height\s*:\s*([\d.]+)px/i', $classDeclarations, $lineMatch) === 1) {
+                        $updatedStyle .= 'line-height:' . round((float) $lineMatch[1] * $scaleY, 2) . 'px;';
+                    }
+                    break;
+                }
+            }
             $updatedStyle = rtrim(trim($updatedStyle), ';') . ';position:absolute;top:' . round($top, 2) . 'px;';
 
             // pdftohtml posiciona os parágrafos pela caixa original do PDF.

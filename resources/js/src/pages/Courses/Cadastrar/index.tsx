@@ -704,7 +704,10 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     .map(className => classStyles.get(className) || '')
                     .filter(Boolean)
                     .join(';');
-                const effectiveStyle = `${classStyle};${styleAttr}`;
+                // Inline declarations have precedence over .ftXX class rules in the
+                // browser. Keep the same precedence here so scaled PDF typography
+                // remains effective even for templates saved before the fix.
+                const effectiveStyle = `${styleAttr};${classStyle}`;
                 const isImportedParagraph = div.tagName.toLowerCase() === 'p';
                 const isPersistedPdfElement = div.getAttribute('data-pdf-positioned') === 'true'
                     || (/transform\s*:\s*none/i.test(styleAttr) && /white-space\s*:\s*pre(?:;|\s|$)/i.test(styleAttr));
