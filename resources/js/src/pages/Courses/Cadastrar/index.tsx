@@ -1642,7 +1642,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 const horizontalPadding = selectedId ? (96 + 32) : 64;
                 const availableWidth = Math.max(300, wrapperWidth - horizontalPadding);
 
-                const targetWidth = 1123;
+                const targetWidth = activeOrientation === 'landscape' ? 1123 : 794;
                 let newScale = availableWidth / targetWidth;
 
                 // Cap the scale factor to at most 1.0 to ensure the certificate stays elegant,
@@ -4208,7 +4208,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                             position: 'sticky',
                             top: '12px',
                             width: '100%',
-                            maxWidth: `${1123 * canvasScale}px`,
+                            maxWidth: `${(activeOrientation === 'landscape' ? 1123 : 794) * canvasScale}px`,
                             background: 'linear-gradient(135deg, rgba(20, 20, 25, 0.92) 0%, rgba(28, 28, 35, 0.96) 100%)',
                             backdropFilter: 'blur(16px)',
                             WebkitBackdropFilter: 'blur(16px)',
@@ -4515,8 +4515,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
 
                     {/* Bounded parent wrapping the A4 canvas to keep it centered and maintain heights */}
                     <div style={{
-                        width: `${(activeOrientation === 'landscape' ? 1123 : 1123) * canvasScale}px`,
-                        height: `${(activeOrientation === 'landscape' ? 794 : 1588) * canvasScale}px`,
+                        width: `${(activeOrientation === 'landscape' ? 1123 : 794) * canvasScale}px`,
+                        height: `${(activeOrientation === 'landscape' ? 794 : 1123) * canvasScale}px`,
                         position: 'relative',
                         overflow: 'visible',
                         margin: '0 auto',
@@ -4527,8 +4527,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                             ref={canvasRef}
                             onClick={handleCanvasClick}
                             style={{
-                                width: activeOrientation === 'landscape' ? '1123px' : '1123px',
-                                height: activeOrientation === 'landscape' ? '794px' : '1588px',
+                                width: activeOrientation === 'landscape' ? '1123px' : '794px',
+                                height: activeOrientation === 'landscape' ? '794px' : '1123px',
                                 background: activeBgTheme === 'custom-image' ? `url('${activeCustomBgUrl}') center/cover no-repeat` : '#ffffff',
                                 position: 'absolute',
                                 top: 0,
