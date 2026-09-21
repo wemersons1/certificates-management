@@ -622,13 +622,35 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
         try {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            // Select ONLY direct div children of .content-side — never use .cert-container > div
-            // which incorrectly captures structural divs (pattern-side, content-side, frame borders)
-            const divs = doc.querySelectorAll('.cert-container > .content-side > div');
+            // Manual templates use direct divs, while imported PDF templates use direct
+            // paragraphs. Parsing only divs drops every imported text block and produces
+            // an empty content-side on the next export.
+            const divs = doc.querySelectorAll('.cert-container > .content-side > div, .cert-container > .content-side > p');
+            const pageRoot = doc.querySelector('.cert-container');
+            const pageStyle = pageRoot?.getAttribute('style') || '';
+            const pageWidthMatch = pageStyle.match(/width\s*:\s*([\d.]+)px/i);
+            const pageHeightMatch = pageStyle.match(/height\s*:\s*([\d.]+)px/i);
+            const pageWidth = pageWidthMatch ? parseFloat(pageWidthMatch[1]) : (latestAssetStateRef.current?.orientation === 'portrait' ? 794 : 1123);
+            const pageHeight = pageHeightMatch ? parseFloat(pageHeightMatch[1]) : (latestAssetStateRef.current?.orientation === 'portrait' ? 1123 : 794);
+
+            const classStyles = new Map<string, string>();
+            doc.querySelectorAll('style').forEach(styleNode => {
+                const css = styleNode.textContent || '';
+                css.replace(/\.([\w-]+)\s*\{([^}]+)\}/g, (_match, className, declarations) => {
+                    classStyles.set(className, declarations);
+                    return _match;
+                });
+            });
 
             const parsedElements: TextElement[] = [];
             divs.forEach((div, idx) => {
                 const styleAttr = div.getAttribute('style') || '';
+                const classStyle = Array.from(div.classList)
+                    .map(className => classStyles.get(className) || '')
+                    .filter(Boolean)
+                    .join(';');
+                const effectiveStyle = `${classStyle};${styleAttr}`;
+                const isImportedParagraph = div.tagName.toLowerCase() === 'p';
 
                 // Skip logo elements or signature elements, as well as structural wrapper containers
                 if (div.querySelector('img') || styleAttr.includes('z-index: 30') || styleAttr.includes('z-index: 31') || div.classList.contains('pattern-shape-1') || div.classList.contains('pattern-shape-2') || div.classList.contains('content-side') || div.classList.contains('pattern-side')) {
@@ -660,11 +682,18 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
 
                 const leftMatch = styleAttr.match(/left:\s*([\d.]+)%/);
                 const topMatch = styleAttr.match(/top:\s*([\d.]+)%/);
-                if (!leftMatch || !topMatch) {
+                const topPxMatch = styleAttr.match(/top:\s*([\d.]+)px/i);
+                if ((!leftMatch || !topMatch) && (!isImportedParagraph || !topPxMatch)) {
                     return; // Skip structural, phantom, or legacy corrupted containers lacking exact coordinates
                 }
-                x = parseFloat(leftMatch[1]);
-                y = parseFloat(topMatch[1]);
+                if (isImportedParagraph && topPxMatch) {
+                    x = 50;
+                    y = (parseFloat(topPxMatch[1]) / pageHeight) * 100;
+                    width = Math.round(pageWidth);
+                } else {
+                    x = parseFloat(leftMatch![1]);
+                    y = parseFloat(topMatch![1]);
+                }
 
                 if (isLine) {
                     const heightMatch = styleAttr.match(/height:\s*(\d+)px/);
@@ -673,25 +702,25 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     const bgColorMatch = styleAttr.match(/background-color:\s*(#[0-9a-fA-F]+|rgba?\([^)]+\)|[a-zA-Z]+)/);
                     if (bgColorMatch) color = bgColorMatch[1];
                 } else {
-                    const sizeMatch = styleAttr.match(/font-size:\s*(\d+)px/);
+                    const sizeMatch = effectiveStyle.match(/font-size:\s*([\d.]+)px/i);
                     if (sizeMatch) fontSize = parseInt(sizeMatch[1]);
 
-                    const colorMatch = styleAttr.match(/color:\s*(#[0-9a-fA-F]+|rgba?\([^)]+\))/);
+                    const colorMatch = effectiveStyle.match(/color:\s*(#[0-9a-fA-F]+|rgba?\([^)]+\)|[a-zA-Z]+)/i);
                     if (colorMatch) color = colorMatch[1];
 
-                    const familyMatch = styleAttr.match(/font-family:\s*'([^']+)'/);
-                    if (familyMatch) fontFamily = familyMatch[1];
+                    const familyMatch = effectiveStyle.match(/font-family:\s*(?:'([^']+)'|([^;,]+))/i);
+                    if (familyMatch) fontFamily = (familyMatch[1] || familyMatch[2]).trim();
 
-                    const weightMatch = styleAttr.match(/font-weight:\s*(\w+)/);
+                    const weightMatch = effectiveStyle.match(/font-weight:\s*(\w+)/i);
                     if (weightMatch) {
                         const parsedWeight = weightMatch[1];
                         fontWeight = ['600', 'bold', '700', '800', '900'].includes(parsedWeight) ? '600' : '500';
                     }
 
-                    if (styleAttr.includes('font-style: italic')) fontStyle = 'italic';
-                    if (styleAttr.includes('text-decoration: underline')) textDecoration = 'underline';
+                    if (effectiveStyle.includes('font-style: italic')) fontStyle = 'italic';
+                    if (effectiveStyle.includes('text-decoration: underline')) textDecoration = 'underline';
 
-                    const alignMatch = styleAttr.match(/text-align:\s*(\w+)/);
+                    const alignMatch = effectiveStyle.match(/text-align:\s*(\w+)/i);
                     if (alignMatch) {
                         const alignVal = alignMatch[1];
                         if (alignVal === 'left' || alignVal === 'center' || alignVal === 'right' || alignVal === 'justify') {
@@ -700,12 +729,18 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     }
                 }
 
-                const widthMatch = styleAttr.match(/width:\s*([\d.]+)px/);
-                if (widthMatch) width = Math.round(parseFloat(widthMatch[1]));
+                if (!isImportedParagraph) {
+                    const widthMatch = styleAttr.match(/width:\s*([\d.]+)px/);
+                    if (widthMatch) width = Math.round(parseFloat(widthMatch[1]));
+                }
 
                 let height: number | undefined = undefined;
                 const heightMatch = styleAttr.match(/height:\s*([\d.]+)px/);
                 if (heightMatch && !isLine) height = Math.round(parseFloat(heightMatch[1]));
+
+                if (isImportedParagraph && div.querySelector('b, strong')) {
+                    fontWeight = '600';
+                }
 
                 // Create a unique stable ID based on page and index
                 const id = `parsed-${pageNum}-${idx}-${Math.random().toString(36).substr(2, 4)}`;
