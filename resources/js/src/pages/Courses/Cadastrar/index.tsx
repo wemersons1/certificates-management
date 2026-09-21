@@ -706,6 +706,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     .join(';');
                 const effectiveStyle = `${classStyle};${styleAttr}`;
                 const isImportedParagraph = div.tagName.toLowerCase() === 'p';
+                const isPersistedPdfElement = div.getAttribute('data-pdf-positioned') === 'true'
+                    || (/transform\s*:\s*none/i.test(styleAttr) && /white-space\s*:\s*pre(?:;|\s|$)/i.test(styleAttr));
 
                 // Skip logo elements or signature elements, as well as structural wrapper containers
                 if (div.querySelector('img') || styleAttr.includes('z-index: 30') || styleAttr.includes('z-index: 31') || div.classList.contains('pattern-shape-1') || div.classList.contains('pattern-shape-2') || div.classList.contains('content-side') || div.classList.contains('pattern-side')) {
@@ -749,6 +751,12 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     x = (leftPx / pageWidth) * 100;
                     y = (parseFloat(topPxMatch[1]) / pageHeight) * 100;
                     width = Math.max(1, Math.round(pageWidth - leftPx));
+                    pdfPositioned = true;
+                } else if (isPersistedPdfElement && leftMatch && topMatch) {
+                    // Exported templates are stored as divs with percentage positions.
+                    // The marker keeps their original PDF anchoring across reloads.
+                    x = parseFloat(leftMatch[1]);
+                    y = parseFloat(topMatch[1]);
                     pdfPositioned = true;
                 } else {
                     x = parseFloat(leftMatch![1]);
@@ -3235,7 +3243,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
             const lineHeight = el.lineHeight ?? 1.45;
             const whiteSpace = el.pdfPositioned ? 'pre' : 'pre-wrap';
             const wordBreak = el.pdfPositioned ? 'normal' : 'break-word';
-            return `<div style="position: absolute; left: ${el.x}%; top: ${el.y}%; transform: ${transform}; font-size: ${el.fontSize}px; color: ${el.color}; font-family: '${el.fontFamily}', sans-serif; font-weight: ${el.fontWeight}; ${fontStyle} ${textDecor} text-align: ${el.textAlign}; ${widthStyle} ${heightStyle} line-height: ${lineHeight}; margin: 0; padding: 0; white-space: ${whiteSpace}; word-break: ${wordBreak}; overflow-wrap: normal;">${el.html ?? el.text}</div>`;
+            const pdfMarker = el.pdfPositioned ? ' data-pdf-positioned="true"' : '';
+            return `<div${pdfMarker} style="position: absolute; left: ${el.x}%; top: ${el.y}%; transform: ${transform}; font-size: ${el.fontSize}px; color: ${el.color}; font-family: '${el.fontFamily}', sans-serif; font-weight: ${el.fontWeight}; ${fontStyle} ${textDecor} text-align: ${el.textAlign}; ${widthStyle} ${heightStyle} line-height: ${lineHeight}; margin: 0; padding: 0; white-space: ${whiteSpace}; word-break: ${wordBreak}; overflow-wrap: normal;">${el.html ?? el.text}</div>`;
 
         }).join('');
 
