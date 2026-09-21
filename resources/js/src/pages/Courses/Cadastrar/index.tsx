@@ -3233,7 +3233,9 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
             const widthStyle = `width: ${el.width}px;`;
             const transform = el.pdfPositioned ? 'none' : 'translate(-50%, 0)';
             const lineHeight = el.lineHeight ?? 1.45;
-            return `<div style="position: absolute; left: ${el.x}%; top: ${el.y}%; transform: ${transform}; font-size: ${el.fontSize}px; color: ${el.color}; font-family: '${el.fontFamily}', sans-serif; font-weight: ${el.fontWeight}; ${fontStyle} ${textDecor} text-align: ${el.textAlign}; ${widthStyle} ${heightStyle} line-height: ${lineHeight}; margin: 0; padding: 0; white-space: pre-wrap; word-break: break-word;">${el.html ?? el.text}</div>`;
+            const whiteSpace = el.pdfPositioned ? 'pre' : 'pre-wrap';
+            const wordBreak = el.pdfPositioned ? 'normal' : 'break-word';
+            return `<div style="position: absolute; left: ${el.x}%; top: ${el.y}%; transform: ${transform}; font-size: ${el.fontSize}px; color: ${el.color}; font-family: '${el.fontFamily}', sans-serif; font-weight: ${el.fontWeight}; ${fontStyle} ${textDecor} text-align: ${el.textAlign}; ${widthStyle} ${heightStyle} line-height: ${lineHeight}; margin: 0; padding: 0; white-space: ${whiteSpace}; word-break: ${wordBreak}; overflow-wrap: normal;">${el.html ?? el.text}</div>`;
 
         }).join('');
 
@@ -4971,7 +4973,9 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                 minHeight: (el.type !== 'line' && el.height) ? `${el.height}px` : 'auto',
                                                 display: 'inline-block',
                                                 overflow: 'visible',
-                                                whiteSpace: 'pre-wrap',
+                                                whiteSpace: el.pdfPositioned ? 'pre' : 'pre-wrap',
+                                                wordBreak: el.pdfPositioned ? 'normal' : 'break-word',
+                                                overflowWrap: el.pdfPositioned ? 'normal' : 'break-word',
                                                 cursor: draggingId === el.id ? 'grabbing' : 'grab',
                                                 padding: el.type === 'line' || el.pdfPositioned ? '0px' : '0px 4px',
                                                 borderRadius: el.type === 'line' ? '0px' : '4px',
