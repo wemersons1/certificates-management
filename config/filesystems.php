@@ -49,13 +49,17 @@ return [
 
         's3' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID_S3'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY_S3'),
-            'region' => env('AWS_DEFAULT_REGION_S3'),
-            'bucket' => env('AWS_BUCKET_S3'),
-            'url' => env('AWS_URL_S3'),
-            'endpoint' => env('AWS_ENDPOINT_S3'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT_S3', false),
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_DEFAULT_REGION', 'auto'),
+            'bucket' => env('R2_BUCKET'),
+            'url' => env('R2_PUBLIC_URL')
+                ? rtrim(env('R2_PUBLIC_URL'), '/') . '/' . trim(env('R2_DIRECTORY', 'certificates-management'), '/')
+                : null,
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => env('R2_USE_PATH_STYLE_ENDPOINT', false),
+            // Todos os arquivos gravados neste disk ficam dentro desta pasta no bucket.
+            'root' => trim(env('R2_DIRECTORY', 'certificates-management'), '/'),
             'throw' => false,
             'report' => false,
         ],
