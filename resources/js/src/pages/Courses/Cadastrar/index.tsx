@@ -5061,8 +5061,11 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                 fontStyle: fontStyle,
                                                 textDecoration: textDecor,
                                                 textAlign: el.textAlign,
-                                                // Use the stored element width so text wraps consistently with the View HTML output.
-                                                width: `${el.width}px`,
+                                                // PDF single-line runs must not be clipped by a stale
+                                                // persisted width. Keep the original anchor position,
+                                                // but let the visual box grow to the complete text.
+                                                width: el.pdfPositioned ? 'max-content' : `${el.width}px`,
+                                                minWidth: el.pdfPositioned ? 'max-content' : undefined,
                                                 maxWidth: 'none',
                                                 lineHeight: el.lineHeight ?? '1.45',
                                                 height: el.type === 'line'
@@ -6257,7 +6260,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                     }}
                                                     dangerouslySetInnerHTML={{ __html: el.html ?? el.text }}
                                                     style={{
-                                                        width: '100%',
+                                                        width: el.pdfPositioned ? 'max-content' : '100%',
+                                                        minWidth: el.pdfPositioned ? 'max-content' : undefined,
                                                         height: el.height ? '100%' : 'fit-content',
                                                         minHeight: '100%',
                                                         border: 'none',
@@ -6270,7 +6274,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                         fontStyle: 'inherit',
                                                         textAlign: el.textAlign,
                                                         lineHeight: 'inherit',
-                                                        overflow: 'hidden',
+                                                        overflow: el.pdfPositioned ? 'visible' : 'hidden',
                                                         whiteSpace: el.pdfPositioned ? 'pre' : 'pre-wrap',
                                                         wordBreak: el.pdfPositioned ? 'normal' : 'break-word',
                                                         cursor: 'text'
@@ -6281,10 +6285,13 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                     ? <div
                                                         dangerouslySetInnerHTML={{ __html: el.html }}
                                                         style={{
+                                                            width: el.pdfPositioned ? 'max-content' : 'auto',
+                                                            minWidth: el.pdfPositioned ? 'max-content' : undefined,
+                                                            maxWidth: 'none',
                                                             whiteSpace: el.pdfPositioned ? 'pre' : 'pre-wrap',
                                                             wordBreak: el.pdfPositioned ? 'normal' : 'break-word',
+                                                            overflow: 'visible',
                                                             lineHeight: 'inherit',
-                                                            overflow: 'hidden',
                                                         }}
                                                     />
                                                     : el.text
