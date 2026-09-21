@@ -342,6 +342,16 @@ const CourseV4: FC = () => {
                 || data?.document_template
                 || {};
             const latestVersion = certificateTemplate?.latest_version || {};
+            const importedFrameIdValue = latestVersion?.frame_id
+                ?? certificateTemplate?.frame_id
+                ?? extractedCourse?.frame_id
+                ?? data?.frame_id;
+            const importedFrameIdNumber = importedFrameIdValue === null || importedFrameIdValue === undefined
+                ? NaN
+                : Number(importedFrameIdValue);
+            const importedFrameId = Number.isInteger(importedFrameIdNumber) && importedFrameIdNumber > 0
+                ? importedFrameIdNumber
+                : null;
             const importedTemplateHtml = latestVersion?.template
                 || certificateTemplate?.template
                 || extractedCourse?.template
@@ -368,6 +378,7 @@ const CourseV4: FC = () => {
                 hasCertContainer: importedTemplateHtml.includes('cert-container'),
                 hasContentSide: importedTemplateHtml.includes('content-side'),
                 paragraphCount: (importedTemplateHtml.match(/<p\b/gi) || []).length,
+                frameId: importedFrameId,
             });
 
             const name = extractedCourse?.name || '';
@@ -388,12 +399,12 @@ const CourseV4: FC = () => {
             // Fall back to frame_base64 only when running locally without S3.
             if (data?.frame_url || data?.frame_base64) {
                 setCustomFrameUrl(data.frame_url || data.frame_base64);
-                setSelectedFrameId('custom');
+                setSelectedFrameId(importedFrameId ?? 'custom');
             }
 
             if (data?.back_frame_url || data?.back_frame_base64) {
                 setCustomBackFrameUrl(data.back_frame_url || data.back_frame_base64);
-                setSelectedBackFrameId('custom_back');
+                setSelectedBackFrameId(importedFrameId ?? 'custom_back');
                 setHasVerso(true);
             } else {
                 setHasVerso(false);
@@ -673,7 +684,13 @@ const CourseV4: FC = () => {
         let backDocumentTreated = substituirPlaceholderQRCodePorMascara(currentBackDocument ?? '');
         backDocumentTreated = substituirAssinaturaInstrutoresPorMascara(backDocumentTreated);
 
-        let finalBorderId = currentFrameId;
+        const numericFrameIdValue = currentFrameId === null || currentFrameId === undefined || currentFrameId === ''
+            ? NaN
+            : Number(currentFrameId);
+        const numericFrameId = Number.isInteger(numericFrameIdValue) && numericFrameIdValue > 0
+            ? numericFrameIdValue
+            : null;
+        let finalBorderId: number | null = numericFrameId;
 
         // Custom borders handling (saving image files to Backend)
         const isFrameBase64 = currentCustomFrame?.startsWith('data:image/');
@@ -695,14 +712,18 @@ const CourseV4: FC = () => {
             }
         }
 
+        const safeFrameType = currentFrameType === 'custom' && finalBorderId === null
+            ? 'color'
+            : currentFrameType;
+
         const payload = {
             name: courseName,
             template: templateTreated,
             back_document: backDocumentTreated || null,
             orientation: currentOrientation,
-            frame_type: currentFrameType,
-            frame_color: currentFrameType === 'color' ? currentFrameColor : null,
-            frame_id: currentFrameType === 'custom' ? finalBorderId : null,
+            frame_type: safeFrameType,
+            frame_color: safeFrameType === 'color' ? currentFrameColor : null,
+            frame_id: safeFrameType === 'custom' ? finalBorderId : null,
             type_id: 1,
             skip_gemini_mask_job: true
         };
