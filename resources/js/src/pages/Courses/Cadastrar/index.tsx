@@ -541,6 +541,37 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
         onPageChange,
         onVersoChange,
     }, ref) => {
+    const normalizeHtmlPayload = (value: string): string => {
+        let normalized = String(value ?? '').trim();
+
+        // Some API paths return the template as a JSON-encoded string,
+        // including surrounding quotes and escaped newlines.
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+            const looksLikeJsonString = normalized.length >= 2
+                && normalized.startsWith('"')
+                && normalized.endsWith('"');
+            if (!looksLikeJsonString) break;
+
+            try {
+                const decoded = JSON.parse(normalized);
+                if (typeof decoded !== 'string') break;
+                normalized = decoded.trim();
+            } catch {
+                break;
+            }
+        }
+
+        if (/\\n|\\r|\\"/.test(normalized)) {
+            normalized = normalized
+                .replace(/\\r\\n/g, '\n')
+                .replace(/\\n/g, '\n')
+                .replace(/\\r/g, '\n')
+                .replace(/\\"/g, '"');
+        }
+
+        return normalized;
+    };
+
     const dispatch = useDispatch();
     const templateTraceIdRef = useRef(
         typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -623,6 +654,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
 
     // Helper to parse HTML template back into TextElements
     const parseTemplateHtml = (html: string, pageNum: number): TextElement[] => {
+        html = normalizeHtmlPayload(html);
         if (!html || !html.trim()) {
             console.warn('[Template Trace] parser received empty HTML', {
                 traceId: templateTraceIdRef.current,
@@ -1217,7 +1249,17 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
             return getPageHTML(pageNum);
         },
         updatePageHTML: (pageNum: number, newHtml: string) => {
-            const parsed = parseTemplateHtml(newHtml, pageNum);
+            const normalizedHtml = normalizeHtmlPayload(newHtml);
+            console.info('[Template Trace] updatePageHTML', {
+                traceId: templateTraceIdRef.current,
+                pageNum,
+                receivedBytes: String(newHtml ?? '').length,
+                normalizedBytes: normalizedHtml.length,
+                wasNormalized: normalizedHtml !== String(newHtml ?? '').trim(),
+                hasCertContainer: normalizedHtml.includes('cert-container'),
+                hasContentSide: normalizedHtml.includes('content-side'),
+            });
+            const parsed = parseTemplateHtml(normalizedHtml, pageNum);
             setElements(prev => {
                 // Elements without a 'page' field are implicitly page 1 (DEFAULT_TEXT_ELEMENTS have no page)
                 const otherPages = prev.filter(el => (el.page ?? 1) !== pageNum);
