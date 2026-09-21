@@ -27,6 +27,23 @@ const A4_LANDSCAPE_WIDTH_IN_PX = 1123;
 const A4_LANDSCAPE_HEIGHT_IN_PX = 794;
 const EDITOR_SCALE = 1.12;
 
+const createTemplateTraceId = (): string => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `template-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+};
+
+const summarizeTemplateForTrace = (html: string) => ({
+  bytes: html.length,
+  paragraphs: (html.match(/<p\b/gi) || []).length,
+  divs: (html.match(/<div\b/gi) || []).length,
+  hasCertContainer: html.includes('cert-container'),
+  hasContentSide: html.includes('content-side'),
+  hasPositionedText: /position:\s*absolute/i.test(html),
+  hasJessica: html.includes('Jessica'),
+});
+
 const getNormalizedTemplateValue = (htmlValue: string, orientation: string) => {
   if (!htmlValue) return '';
   return htmlValue.replace(/<div([^>]*id="page\d+-div"[^>]*style="([^"]*)")[^>]*>/gi, (match, fullAttr, styleAttr) => {
@@ -1234,8 +1251,23 @@ const DocumentTemplateForm: FC = () => {
     getTemplateFrames();
 
     if (isEdit && courseId) {
-      api.get(`/courses/${courseId}`).then(res => {
+      const traceId = createTemplateTraceId();
+      api.get(`/courses/${courseId}`, {
+        headers: { 'X-Template-Trace-ID': traceId },
+      }).then(res => {
         const data = res.data;
+        console.group('[Template Trace] API response');
+        console.info({
+          traceId,
+          responseTraceId: res.headers?.['x-template-trace-id'],
+          topLevelKeys: Object.keys(data || {}),
+          courseKeys: Object.keys(data?.course || {}),
+          certificateTemplateKeys: Object.keys(data?.course?.certificate_template || data?.certificate_template || {}),
+          directTemplate: summarizeTemplateForTrace(String(data?.template || '')),
+          courseTemplate: summarizeTemplateForTrace(String(data?.course?.template || '')),
+          certificateTemplate: summarizeTemplateForTrace(String(data?.course?.certificate_template?.template || data?.certificate_template?.template || '')),
+        });
+        console.groupEnd();
         // The API may return the course directly or wrapped in `course` (as the
         // import-template response does). Normalize both shapes before reading
         // the template so the editor never falls back to an empty/default value.
@@ -1255,6 +1287,21 @@ const DocumentTemplateForm: FC = () => {
           ?? courseData?.back_document
           ?? data?.back_document
           ?? '';
+
+        console.group('[Template Trace] selected template');
+        console.info({
+          traceId,
+          source: certificateTemplate?.template !== undefined
+            ? 'certificate_template.template'
+            : latestVersion?.template !== undefined
+              ? 'certificate_template.latest_version.template'
+              : courseData?.template !== undefined
+                ? 'course.template'
+                : data?.template !== undefined ? 'template' : 'none',
+          ...summarizeTemplateForTrace(String(templateHtml)),
+          backDocumentBytes: String(backDocumentHtml).length,
+        });
+        console.groupEnd();
 
         let templateContent = substituirMascaraPorAssinaturaInstrutores(templateHtml);
         templateContent = substituirMascaraQRCodePorPlaceholder(templateContent);

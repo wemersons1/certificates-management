@@ -9,6 +9,8 @@ use App\Models\DocumentTemplate;
 use App\Services\Template\CourseTemplateUploadService;
 use Illuminate\Http\Request;
 use App\Services\Files\R2Path;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CourseController extends Controller
@@ -100,10 +102,33 @@ class CourseController extends Controller
         return $courses->paginate();
     }
 
-    public function show($id) {
-        return Course::myScope()
-        ->with(['certificateTemplate.latestVersion.type', 'courseFiles'])
-        ->findOrFail($id);
+    public function show($id, Request $request) {
+        $traceId = (string) ($request->header('X-Template-Trace-ID') ?: Str::uuid());
+        $course = Course::myScope()
+            ->with(['certificateTemplate.latestVersion.type', 'courseFiles'])
+            ->findOrFail($id);
+
+        $template = $course->certificateTemplate;
+        $templateHtml = (string) ($template?->template ?? '');
+        $backDocument = (string) ($template?->back_document ?? '');
+
+        Log::channel('course_template_import')->info('course_response', [
+            'trace_id' => $traceId,
+            'course_id' => $course->id,
+            'course_name' => $course->name,
+            'template_source' => $template?->template !== null
+                ? 'course.certificate_template.template'
+                : ($template?->latestVersion?->template !== null ? 'course.certificate_template.latest_version.template' : 'none'),
+            'template_bytes' => strlen($templateHtml),
+            'template_paragraph_count' => substr_count($templateHtml, '<p'),
+            'template_div_count' => substr_count($templateHtml, '<div'),
+            'has_cert_container' => str_contains($templateHtml, 'cert-container'),
+            'has_content_side' => str_contains($templateHtml, 'content-side'),
+            'has_positioned_text' => preg_match('/position:\s*absolute/i', $templateHtml) === 1,
+            'back_document_bytes' => strlen($backDocument),
+        ]);
+
+        return response()->json($course)->header('X-Template-Trace-ID', $traceId);
     }
 
     public function update(UpdateCourseRequest $request, $id) 

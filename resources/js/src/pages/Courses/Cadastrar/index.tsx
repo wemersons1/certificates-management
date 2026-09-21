@@ -542,6 +542,11 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
         onVersoChange,
     }, ref) => {
     const dispatch = useDispatch();
+    const templateTraceIdRef = useRef(
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : `editor-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
     const reduxTheme = useSelector((state: any) => state);
     const initialThemeRef = useRef(reduxTheme);
 
@@ -618,7 +623,13 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
 
     // Helper to parse HTML template back into TextElements
     const parseTemplateHtml = (html: string, pageNum: number): TextElement[] => {
-        if (!html || !html.trim()) return [];
+        if (!html || !html.trim()) {
+            console.warn('[Template Trace] parser received empty HTML', {
+                traceId: templateTraceIdRef.current,
+                pageNum,
+            });
+            return [];
+        }
         try {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
@@ -632,6 +643,16 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
             const pageHeightMatch = pageStyle.match(/height\s*:\s*([\d.]+)px/i);
             const pageWidth = pageWidthMatch ? parseFloat(pageWidthMatch[1]) : (latestAssetStateRef.current?.orientation === 'portrait' ? 794 : 1123);
             const pageHeight = pageHeightMatch ? parseFloat(pageHeightMatch[1]) : (latestAssetStateRef.current?.orientation === 'portrait' ? 1123 : 794);
+
+            console.info('[Template Trace] parser input', {
+                traceId: templateTraceIdRef.current,
+                pageNum,
+                htmlBytes: html.length,
+                directDivs: doc.querySelectorAll('.cert-container > .content-side > div').length,
+                directParagraphs: doc.querySelectorAll('.cert-container > .content-side > p').length,
+                pageWidth,
+                pageHeight,
+            });
 
             const classStyles = new Map<string, string>();
             doc.querySelectorAll('style').forEach(styleNode => {
@@ -777,10 +798,20 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     page: pageNum
                 });
             });
+            console.info('[Template Trace] parser output', {
+                traceId: templateTraceIdRef.current,
+                pageNum,
+                parsedElements: parsedElements.length,
+                texts: parsedElements.slice(0, 20).map(element => element.text),
+            });
             return parsedElements;
 
         } catch (e) {
-            console.error('Erro ao fazer parse do HTML do template:', e);
+            console.error('[Template Trace] parser failed', {
+                traceId: templateTraceIdRef.current,
+                pageNum,
+                error: e,
+            });
             return [];
         }
     };
@@ -3150,6 +3181,16 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
 
         }).join('');
 
+        console.info('[Template Trace] export page', {
+            traceId: templateTraceIdRef.current,
+            pageNum,
+            currentElements: curElements.length,
+            pageElements: pageElements.length,
+            elementTexts: pageElements.slice(0, 20).map(element => element.text),
+            elementsHtmlBytes: elementsHtml.length,
+            elementsHtmlHasJessica: elementsHtml.includes('Jessica'),
+        });
+
         const pageOrientation = pageNum === 1 ? curOrientation : curOrientationPage2;
         const pageBgTheme = pageNum === 1 ? curBgTheme : curBgThemePage2;
         const pageFrameColor = pageNum === 1 ? curFrameColor : curFrameColorPage2;
@@ -3227,7 +3268,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
         `;
         }).join('');
 
-        return `
+        const pageHtml = `
         <div class="cert-container" style="
             width: ${widthPx}px;
             height: ${heightPx}px;
@@ -3256,6 +3297,17 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 ${elementsHtml}
             </div>
         </div>`;
+
+        console.info('[Template Trace] export result', {
+            traceId: templateTraceIdRef.current,
+            pageNum,
+            htmlBytes: pageHtml.length,
+            hasContentSide: pageHtml.includes('content-side'),
+            contentSideEmpty: /content-side[^>]*>\s*<\/div>/i.test(pageHtml),
+            hasJessica: pageHtml.includes('Jessica'),
+        });
+
+        return pageHtml;
     };
 
     const handleExportHTML = () => {
