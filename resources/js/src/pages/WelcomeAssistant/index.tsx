@@ -12,6 +12,7 @@ const iconDocuments = <i className="bx bx-file"></i>;
 
 // Chave para armazenar o estado no localStorage
 const ASSISTANT_STORAGE_KEY = 'welcomeAssistantStatus';
+const ASSISTANT_SHOWN_KEY = 'welcomeAssistantShown';
 const ASSISTANT_LAST_STEP = 3;
 
 // Estrutura das etapas
@@ -79,6 +80,14 @@ const WelcomeAssistantModern: FC<WelcomeAssistantProps> = ({ show = false, block
             return;
         }
 
+        const hasBeenShown = localStorage.getItem(ASSISTANT_SHOWN_KEY) === 'true';
+
+        if (hasBeenShown) {
+            setShowModal(false);
+            setCurrentStep(0);
+            return;
+        }
+
         const storedStatus = localStorage.getItem(ASSISTANT_STORAGE_KEY);
         const shouldForceShow = Boolean(show);
         const shouldShow =
@@ -91,9 +100,11 @@ const WelcomeAssistantModern: FC<WelcomeAssistantProps> = ({ show = false, block
             const step = storedStatus ? parseInt(storedStatus) : 1;
 
             if (step > 0 && step <= ASSISTANT_LAST_STEP) {
+                localStorage.setItem(ASSISTANT_SHOWN_KEY, 'true');
                 setCurrentStep(step);
                 setShowModal(true);
             } else {
+                localStorage.setItem(ASSISTANT_SHOWN_KEY, 'true');
                 setCurrentStep(1);
                 setShowModal(true);
             }
