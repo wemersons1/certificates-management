@@ -50,6 +50,8 @@ const CourseV4: FC = () => {
     const [htmlValue, setHtmlValue] = useState<string>('');
     const [htmlModalActiveTab, setHtmlModalActiveTab] = useState<'preview' | 'code'>('preview');
     const [iframeSrc, setIframeSrc] = useState<string>('');
+    const [importedTemplate, setImportedTemplate] = useState<string>('');
+    const [importedBackDocument, setImportedBackDocument] = useState<string>('');
 
     const [creditsBalance, setCreditsBalance] = useState<{ total: number } | null>(null);
     const [showPaywallModal, setShowPaywallModal] = useState<boolean>(false);
@@ -335,6 +337,38 @@ const CourseV4: FC = () => {
             const data = apiResponse?.data;
             const extractedCourse = data?.extracted?.course || data?.course;
             const extractedInstructor = data?.extracted?.instructor || data?.instructor;
+            const certificateTemplate = extractedCourse?.certificate_template
+                || data?.certificate_template
+                || data?.document_template
+                || {};
+            const latestVersion = certificateTemplate?.latest_version || {};
+            const importedTemplateHtml = latestVersion?.template
+                || certificateTemplate?.template
+                || extractedCourse?.template
+                || data?.template
+                || '';
+            const importedBackDocumentHtml = latestVersion?.back_document
+                || certificateTemplate?.back_document
+                || extractedCourse?.back_document
+                || data?.back_document
+                || '';
+
+            console.info('[Template Trace] import-template response', {
+                topLevelKeys: Object.keys(data || {}),
+                courseKeys: Object.keys(extractedCourse || {}),
+                certificateTemplateKeys: Object.keys(certificateTemplate || {}),
+                templateSource: latestVersion?.template
+                    ? 'course.certificate_template.latest_version.template'
+                    : certificateTemplate?.template
+                        ? 'course.certificate_template.template'
+                        : extractedCourse?.template
+                            ? 'course.template'
+                            : data?.template ? 'template' : 'none',
+                templateBytes: importedTemplateHtml.length,
+                hasCertContainer: importedTemplateHtml.includes('cert-container'),
+                hasContentSide: importedTemplateHtml.includes('content-side'),
+                paragraphCount: (importedTemplateHtml.match(/<p\b/gi) || []).length,
+            });
 
             const name = extractedCourse?.name || '';
             const hours = extractedCourse?.number_of_hours_studied || '';
@@ -344,6 +378,8 @@ const CourseV4: FC = () => {
             setCourseName(name);
             setCourseHours(hours);
             setOrientation(extractedOrientation);
+            setImportedTemplate(importedTemplateHtml);
+            setImportedBackDocument(importedBackDocumentHtml);
             if (instName) {
                 setInstructorName(instName);
             }
@@ -1021,6 +1057,8 @@ const CourseV4: FC = () => {
                                     initialCourseName={courseName}
                                     initialHours={courseHours}
                                     initialInstructorName={instructorName}
+                                    initialTemplate={importedTemplate || undefined}
+                                    initialBackDocument={importedBackDocument || undefined}
                                     onPageChange={setEditorPage}
                                     onVersoChange={setEditorHasVerso}
                                 />
