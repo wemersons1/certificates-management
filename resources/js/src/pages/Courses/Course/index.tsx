@@ -1236,23 +1236,44 @@ const DocumentTemplateForm: FC = () => {
     if (isEdit && courseId) {
       api.get(`/courses/${courseId}`).then(res => {
         const data = res.data;
-        let templateContent = substituirMascaraPorAssinaturaInstrutores(data.certificate_template?.template);
+        // The API may return the course directly or wrapped in `course` (as the
+        // import-template response does). Normalize both shapes before reading
+        // the template so the editor never falls back to an empty/default value.
+        const courseData = data?.course ?? data;
+        const certificateTemplate = courseData?.certificate_template
+          ?? data?.certificate_template
+          ?? data?.document_template
+          ?? {};
+        const latestVersion = certificateTemplate?.latest_version ?? {};
+        const templateHtml = certificateTemplate?.template
+          ?? latestVersion?.template
+          ?? courseData?.template
+          ?? data?.template
+          ?? '';
+        const backDocumentHtml = certificateTemplate?.back_document
+          ?? latestVersion?.back_document
+          ?? courseData?.back_document
+          ?? data?.back_document
+          ?? '';
+
+        let templateContent = substituirMascaraPorAssinaturaInstrutores(templateHtml);
         templateContent = substituirMascaraQRCodePorPlaceholder(templateContent);
 
-        let backDocumentContent = substituirMascaraPorAssinaturaInstrutores(data.back_document ?? '');
+        let backDocumentContent = substituirMascaraPorAssinaturaInstrutores(backDocumentHtml);
         backDocumentContent = substituirMascaraQRCodePorPlaceholder(backDocumentContent);
 
         setItem({
-          name: data.name,
-          number_of_hours_studied: data.number_of_hours_studied,
+          ...certificateTemplate,
+          name: courseData?.name ?? data?.name ?? '',
+          number_of_hours_studied: courseData?.number_of_hours_studied ?? data?.number_of_hours_studied ?? 0,
           template: templateContent,
-          certificate_id: data.certificate_id,
-          ...data.certificate_template
+          back_document: backDocumentContent,
+          certificate_id: courseData?.certificate_id ?? data?.certificate_id ?? 0,
         });
 
-        if (data.certificate_template.frame_type === 'custom') {
+        if (certificateTemplate?.frame_type === 'custom') {
           setTimeout(() => {
-            setSelectedBorder(data.certificate_template.frame_id);
+            setSelectedBorder(certificateTemplate.frame_id);
           }, 2000);
 
         }

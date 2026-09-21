@@ -209,24 +209,40 @@ const CourseEdit: FC = () => {
         if (courseId) {
           const res = await api.get(`/courses/${courseId}`);
           const data = res.data;
+          const courseData = data?.course ?? data;
+          const certificateTemplate = courseData?.certificate_template
+            ?? data?.certificate_template
+            ?? data?.document_template
+            ?? {};
+          const latestVersion = certificateTemplate?.latest_version ?? {};
+          const templateHtml = certificateTemplate?.template
+            ?? latestVersion?.template
+            ?? courseData?.template
+            ?? data?.template
+            ?? '';
+          const backDocumentHtml = certificateTemplate?.back_document
+            ?? latestVersion?.back_document
+            ?? courseData?.back_document
+            ?? data?.back_document
+            ?? '';
 
-          let templateContent = substituirMascaraPorAssinaturaInstrutores(data.certificate_template?.template);
+          let templateContent = substituirMascaraPorAssinaturaInstrutores(templateHtml);
           templateContent = substituirMascaraQRCodePorPlaceholder(templateContent);
 
-          let backDocumentContent = substituirMascaraPorAssinaturaInstrutores(data.certificate_template?.back_document ?? '');
+          let backDocumentContent = substituirMascaraPorAssinaturaInstrutores(backDocumentHtml);
           backDocumentContent = substituirMascaraQRCodePorPlaceholder(backDocumentContent);
 
           setItem({
-            ...data.certificate_template,
-            name: data.name,
-            number_of_hours_studied: data.number_of_hours_studied,
-            template: data.certificate_template?.template,
-            back_document: data.certificate_template?.back_document,
-            certificate_id: data.certificate_id
+            ...certificateTemplate,
+            name: courseData?.name ?? data?.name ?? '',
+            number_of_hours_studied: courseData?.number_of_hours_studied ?? data?.number_of_hours_studied ?? 0,
+            template: templateContent,
+            back_document: backDocumentContent,
+            certificate_id: courseData?.certificate_id ?? data?.certificate_id ?? 0
           });
 
-          if (data.certificate_template?.frame_type === 'custom') {
-            const frameId = data.certificate_template.frame_id;
+          if (certificateTemplate?.frame_type === 'custom') {
+            const frameId = certificateTemplate.frame_id;
             setSelectedBorder(frameId);
 
             // Check if this database border has a distinct back frame
@@ -237,10 +253,10 @@ const CourseEdit: FC = () => {
               }
             }
           }
-          if (data.certificate_template?.frame_color) {
-            setSelectedPalette(data.certificate_template.frame_color);
+          if (certificateTemplate?.frame_color) {
+            setSelectedPalette(certificateTemplate.frame_color);
           }
-          const hasBackDoc = data.certificate_template?.back_document ? true : false;
+          const hasBackDoc = Boolean(backDocumentHtml);
           setEditorHasVerso(hasBackDoc);
         }
       } catch (err) {
