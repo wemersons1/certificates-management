@@ -786,7 +786,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     if (bgColorMatch) color = bgColorMatch[1];
                 } else {
                     const sizeMatch = effectiveStyle.match(/font-size:\s*([\d.]+)px/i);
-                    if (sizeMatch) fontSize = parseInt(sizeMatch[1]);
+                    if (sizeMatch) fontSize = parseFloat(sizeMatch[1]);
 
                     const colorMatch = effectiveStyle.match(/color:\s*(#[0-9a-fA-F]+|rgba?\([^)]+\)|[a-zA-Z]+)/i);
                     if (colorMatch) color = colorMatch[1];

@@ -1047,6 +1047,16 @@ class CourseTemplateUploadService
         $targetHeight = $isPortrait ? 1123.0 : 794.0;
         $scaleX = $targetWidth / $sourceWidth;
         $scaleY = $targetHeight / $sourceHeight;
+        $scaledTypographyStyles = (string) preg_replace_callback(
+            '/\bfont-size\s*:\s*([\d.]+)px/i',
+            static fn (array $match): string => 'font-size:' . round((float) $match[1] * $scaleX, 2) . 'px',
+            $pdfTypographyStyles
+        );
+        $scaledTypographyStyles = (string) preg_replace_callback(
+            '/\bline-height\s*:\s*([\d.]+)px/i',
+            static fn (array $match): string => 'line-height:' . round((float) $match[1] * $scaleY, 2) . 'px',
+            $scaledTypographyStyles
+        );
         $content = '';
 
         foreach (iterator_to_array($page->childNodes) as $child) {
@@ -1103,7 +1113,7 @@ class CourseTemplateUploadService
         }
 
         $flexDirection = $isPortrait ? 'column' : 'row';
-        return $pdfTypographyStyles . '<div class="cert-container" style="width:' . $targetWidth . 'px;height:' . $targetHeight . 'px;flex-shrink:0;background-color:#ffffff;position:relative;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;display:flex;flex-direction:' . $flexDirection . ';page-break-after:always;margin-bottom:30px;">'
+        return $scaledTypographyStyles . '<div class="cert-container" style="width:' . $targetWidth . 'px;height:' . $targetHeight . 'px;flex-shrink:0;background-color:#ffffff;position:relative;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;display:flex;flex-direction:' . $flexDirection . ';page-break-after:always;margin-bottom:30px;">'
             . '<div class="content-side" style="position:relative;padding:0;z-index:2;width:100%;height:100%;">'
             . $content
             . '</div></div>';
