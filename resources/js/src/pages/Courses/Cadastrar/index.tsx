@@ -930,7 +930,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                             Math.ceil((currentLeft + current.width) - ((previous.x / 100) * pageWidthForMerge))
                         );
                         previous.textAlign = 'left';
-                        continue;
+                        return;
                     }
                 }
                 mergedElements.push(current);
