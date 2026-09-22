@@ -45,7 +45,6 @@ interface TextElement {
     height?: number; // px
     lineHeight?: string | number;
     pdfPositioned?: boolean;
-    pdfCentered?: boolean;
     page?: number;
     type?: 'text' | 'line';
 }
@@ -749,7 +748,6 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 let width = isLine ? 150 : 600;
                 let lineHeight: string | number = 1.45;
                 let pdfPositioned = false;
-                let pdfCentered = false;
 
                 const leftMatch = styleAttr.match(/left:\s*([\d.]+)%/);
                 const topMatch = styleAttr.match(/top:\s*([\d.]+)%/);
@@ -845,7 +843,6 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                 }
 
                 if (pdfPositioned && !hasMeaningfulLineBreak) {
-                    pdfCentered = true;
                     // A single PDF line has no explicit CSS width. Its left coordinate
                     // is the actual glyph start, so using the remaining page width made
                     // adjacent runs such as "Ministrante:" and the instructor name
@@ -907,7 +904,6 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     height,
                     lineHeight,
                     pdfPositioned,
-                    pdfCentered,
                     page: pageNum
                 });
             });
@@ -958,12 +954,6 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     }
                 }
                 mergedElements.push(current);
-            });
-            // Store the center of the reference box, never the text's left edge.
-            mergedElements.forEach((element) => {
-                if (element.pdfCentered) {
-                    element.x += (element.width / pageWidthForMerge) * 50;
-                }
             });
             console.info('[Template Trace] parser output', {
                 traceId: templateTraceIdRef.current,
@@ -3354,15 +3344,11 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
             const textDecor = el.textDecoration === 'underline' ? 'text-decoration: underline;' : '';
             const heightStyle = el.height ? `min-height: ${el.height}px; height: auto;` : '';
             const widthStyle = `width: ${el.width}px;`;
-            const transform = el.pdfCentered
-                ? 'translate(-50%, 0)'
-                : (el.pdfPositioned ? 'none' : 'translate(-50%, 0)');
+            const transform = el.pdfPositioned ? 'none' : 'translate(-50%, 0)';
             const lineHeight = el.lineHeight ?? 1.45;
             const whiteSpace = el.pdfPositioned ? 'pre' : 'pre-wrap';
             const wordBreak = el.pdfPositioned ? 'normal' : 'break-word';
-            const pdfMarker = el.pdfPositioned
-                ? ` data-pdf-positioned="true"${el.pdfCentered ? ' data-pdf-centered="true"' : ''}`
-                : '';
+            const pdfMarker = el.pdfPositioned ? ' data-pdf-positioned="true"' : '';
             return `<div${pdfMarker} style="position: absolute; left: ${el.x}%; top: ${el.y}%; transform: ${transform}; font-size: ${el.fontSize}px; color: ${el.color}; font-family: '${el.fontFamily}', sans-serif; font-weight: ${el.fontWeight}; ${fontStyle} ${textDecor} text-align: ${el.textAlign}; ${widthStyle} ${heightStyle} line-height: ${lineHeight}; margin: 0; padding: 0; white-space: ${whiteSpace}; word-break: ${wordBreak}; overflow-wrap: normal;">${el.html ?? el.text}</div>`;
 
         }).join('');
@@ -5083,9 +5069,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                 top: `${el.y}%`,
                                                 transform: el.type === 'line'
                                                     ? 'translate(-50%, -50%)'
-                                                    : (el.pdfCentered
-                                                        ? 'translate(-50%, 0)'
-                                                        : (el.pdfPositioned ? 'none' : 'translate(-50%, 0)')),
+                                                    : (el.pdfPositioned ? 'none' : 'translate(-50%, 0)'),
                                                 fontSize: `${el.fontSize}px`,
                                                 color: el.color,
                                                 fontFamily: `'${el.fontFamily}', sans-serif`,
