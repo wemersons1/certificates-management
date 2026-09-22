@@ -858,7 +858,14 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                         }
                     }
                     if (measuredWidth > 0) {
-                        width = Math.max(1, Math.ceil(measuredWidth + 1));
+                        const leftPx = (x / 100) * pageWidth;
+                        // Keep a proportional anchor box. max-content makes the
+                        // box equal to the text width, leaving text-align:center
+                        // with no internal space in which to center replacements.
+                        width = Math.max(
+                            Math.ceil(measuredWidth + 8),
+                            Math.ceil(pageWidth - (leftPx * 2))
+                        );
                     }
                     textAlign = 'center';
                 }
@@ -931,8 +938,11 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                         previous.html = `${previousHtml}<span style="font-weight:${current.fontWeight};font-style:${current.fontStyle};">${currentHtml}</span>`;
                         previous.text = `${previous.text}${current.text}`;
                         const combinedRight = Math.max(previousLeft + previous.width, currentLeft + current.width);
-                        const combinedWidth = Math.ceil(combinedRight - previousLeft + 8);
-                        const combinedCenter = (previousLeft + combinedRight) / 2;
+                        const combinedWidth = Math.max(
+                            Math.ceil(combinedRight - previousLeft + 8),
+                            Math.ceil(pageWidthForMerge - (previousLeft * 2))
+                        );
+                        const combinedCenter = previousLeft + (combinedWidth / 2);
                         previous.width = combinedWidth;
                         // The first run's left edge is not the center of the
                         // composed line. Re-anchor the complete line around the
@@ -5070,8 +5080,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                 // PDF single-line runs must not be clipped by a stale
                                                 // persisted width. Keep the original anchor position,
                                                 // but let the visual box grow to the complete text.
-                                                width: el.pdfPositioned ? 'max-content' : `${el.width}px`,
-                                                minWidth: el.pdfPositioned ? 'max-content' : undefined,
+                                                width: `${el.width}px`,
+                                                minWidth: undefined,
                                                 maxWidth: 'none',
                                                 lineHeight: el.lineHeight ?? '1.45',
                                                 height: el.type === 'line'
@@ -6266,8 +6276,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                     }}
                                                     dangerouslySetInnerHTML={{ __html: el.html ?? el.text }}
                                                     style={{
-                                                        width: el.pdfPositioned ? 'max-content' : '100%',
-                                                        minWidth: el.pdfPositioned ? 'max-content' : undefined,
+                                                        width: '100%',
+                                                        minWidth: undefined,
                                                         height: el.height ? '100%' : 'fit-content',
                                                         minHeight: '100%',
                                                         border: 'none',
@@ -6291,8 +6301,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                                                     ? <div
                                                         dangerouslySetInnerHTML={{ __html: el.html }}
                                                         style={{
-                                                            width: el.pdfPositioned ? 'max-content' : 'auto',
-                                                            minWidth: el.pdfPositioned ? 'max-content' : undefined,
+                                                            width: '100%',
+                                                            minWidth: undefined,
                                                             maxWidth: 'none',
                                                             whiteSpace: el.pdfPositioned ? 'pre' : 'pre-wrap',
                                                             wordBreak: el.pdfPositioned ? 'normal' : 'break-word',
