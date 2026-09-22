@@ -761,11 +761,10 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     x = (leftPx / pageWidth) * 100;
                     y = (parseFloat(topPxMatch[1]) / pageHeight) * 100;
                     if (!hasMeaningfulLineBreak) {
-                        // A single-line PDF paragraph is positioned by its left edge,
-                        // not by a CSS text box. Create a symmetric box so replacements
-                        // (for example a user-name mask) remain centered on the same axis.
-                        width = Math.max(1, Math.round(pageWidth - (leftPx * 2)));
-                        textAlign = 'center';
+                        // A single-line PDF paragraph is fixed at its original
+                        // left/top coordinate. Do not create a symmetric box or
+                        // apply an automatic alignment.
+                        width = Math.max(1, Math.round(pageWidth - leftPx));
                     } else {
                         width = Math.max(1, Math.round(pageWidth - leftPx));
                     }
@@ -828,9 +827,7 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                         width = Math.round(parseFloat(widthMatch[1]));
                     }
                     if (isPersistedPdfElement && !hasMeaningfulLineBreak) {
-                        const leftPx = (x / 100) * pageWidth;
-                        width = Math.max(1, Math.round(pageWidth - (leftPx * 2)));
-                        textAlign = 'center';
+                        textAlign = 'left';
                     }
                 }
 
@@ -858,17 +855,13 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                         }
                     }
                     if (measuredWidth > 0) {
-                        const leftPx = (x / 100) * pageWidth;
-                        // Keep a proportional anchor box. max-content makes the
-                        // box equal to the text width, leaving text-align:center
-                        // with no internal space in which to center replacements.
-                        width = Math.max(
-                            Math.ceil(measuredWidth + 8),
-                            Math.ceil(pageWidth - (leftPx * 2))
-                        );
+                        width = Math.ceil(measuredWidth + 8);
                     }
-                    textAlign = 'center';
+                    // PDF coordinates are authoritative: do not recenter or
+                    // redistribute a run inside its box.
+                    textAlign = 'left';
                 }
+                if (pdfPositioned) textAlign = 'left';
 
                 // Create a unique stable ID based on page and index
                 const id = `parsed-${pageNum}-${idx}-${Math.random().toString(36).substr(2, 4)}`;
@@ -938,18 +931,8 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                         previous.html = `${previousHtml}<span style="font-weight:${current.fontWeight};font-style:${current.fontStyle};">${currentHtml}</span>`;
                         previous.text = `${previous.text}${current.text}`;
                         const combinedRight = Math.max(previousLeft + previous.width, currentLeft + current.width);
-                        const combinedWidth = Math.max(
-                            Math.ceil(combinedRight - previousLeft + 8),
-                            Math.ceil(pageWidthForMerge - (previousLeft * 2))
-                        );
-                        const combinedCenter = previousLeft + (combinedWidth / 2);
-                        previous.width = combinedWidth;
-                        // The first run's left edge is not the center of the
-                        // composed line. Re-anchor the complete line around the
-                        // original PDF center so the bold prefix and regular name
-                        // remain visually centered as one sentence.
-                        previous.x = ((combinedCenter - (combinedWidth / 2)) / pageWidthForMerge) * 100;
-                        previous.textAlign = 'center';
+                        previous.width = Math.ceil(combinedRight - previousLeft + 8);
+                        previous.textAlign = 'left';
                         return;
                     }
                 }
