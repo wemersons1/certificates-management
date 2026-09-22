@@ -900,13 +900,44 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     page: pageNum
                 });
             });
+            // Keep adjacent PDF runs that share the same baseline in one fixed
+            // line. This avoids overlapping absolute boxes caused by small font
+            // metric differences, while preserving each run's own weight/style.
+            const laidOutElements: TextElement[] = [];
+            parsedElements.forEach((current) => {
+                const previous = laidOutElements[laidOutElements.length - 1];
+                if (
+                    previous &&
+                    previous.pdfPositioned &&
+                    current.pdfPositioned &&
+                    previous.type === 'text' &&
+                    current.type === 'text' &&
+                    Math.abs(previous.y - current.y) < 0.25 &&
+                    current.x >= previous.x &&
+                    current.x - previous.x < ((previous.width + 20) / pageWidth) * 100
+                ) {
+                    const previousLeft = (previous.x / 100) * pageWidth;
+                    const currentLeft = (current.x / 100) * pageWidth;
+                    const previousRight = previousLeft + previous.width;
+                    const gap = Math.max(0, Math.round(currentLeft - previousRight));
+                    const previousHtml = previous.html ?? previous.text;
+                    const currentHtml = current.html ?? current.text;
+                    const runStyle = `font-family:${current.fontFamily};font-size:${current.fontSize}px;font-weight:${current.fontWeight};font-style:${current.fontStyle};`;
+                    previous.html = `${previousHtml}${gap > 0 ? `<span style="display:inline-block;width:${gap}px;"></span>` : ''}<span style="${runStyle}">${currentHtml}</span>`;
+                    previous.text = `${previous.text}${current.text}`;
+                    previous.width = Math.max(previous.width, Math.ceil((currentLeft + current.width) - previousLeft));
+                    previous.textAlign = 'left';
+                    return;
+                }
+                laidOutElements.push(current);
+            });
             console.info('[Template Trace] parser output', {
                 traceId: templateTraceIdRef.current,
                 pageNum,
-                parsedElements: parsedElements.length,
-                texts: parsedElements.slice(0, 20).map(element => element.text),
+                parsedElements: laidOutElements.length,
+                texts: laidOutElements.slice(0, 20).map(element => element.text),
             });
-            return parsedElements;
+            return laidOutElements;
 
         } catch (e) {
             console.error('[Template Trace] parser failed', {
