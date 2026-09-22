@@ -900,51 +900,13 @@ const MasterCourseCreate = forwardRef<any, MasterCourseCreateProps>((
                     page: pageNum
                 });
             });
-            // A PDF line can be split into multiple positioned runs solely because
-            // its formatting changes (for example bold "Ministrante:" followed by
-            // regular "Prof. Alberto Ponzo Neto"). Treat those runs as one editable
-            // line; otherwise their independent boxes overlap and the second run can
-            // be clipped by the first one. The nested span keeps each run's weight.
-            const mergedElements: TextElement[] = [];
-            const pageWidthForMerge = pageWidth;
-            parsedElements.forEach((current) => {
-                const previous = mergedElements[mergedElements.length - 1];
-                if (
-                    previous &&
-                    previous.pdfPositioned &&
-                    current.pdfPositioned &&
-                    previous.type === 'text' &&
-                    current.type === 'text' &&
-                    Math.abs(previous.y - current.y) < 0.25 &&
-                    Math.abs(previous.fontSize - current.fontSize) < 0.1 &&
-                    previous.fontFamily === current.fontFamily
-                ) {
-                    const previousLeft = (previous.x / 100) * pageWidthForMerge;
-                    const currentLeft = (current.x / 100) * pageWidthForMerge;
-                    // Persisted templates may still contain the old artificial
-                    // width, so compare the actual run origins rather than that
-                    // stale box when deciding whether two runs share one line.
-                    const runDistance = currentLeft - previousLeft;
-                    if (runDistance >= -2 && runDistance <= previous.width + 12) {
-                        const previousHtml = previous.html ?? previous.text;
-                        const currentHtml = current.html ?? current.text;
-                        previous.html = `${previousHtml}<span style="font-weight:${current.fontWeight};font-style:${current.fontStyle};">${currentHtml}</span>`;
-                        previous.text = `${previous.text}${current.text}`;
-                        const combinedRight = Math.max(previousLeft + previous.width, currentLeft + current.width);
-                        previous.width = Math.ceil(combinedRight - previousLeft + 8);
-                        previous.textAlign = 'left';
-                        return;
-                    }
-                }
-                mergedElements.push(current);
-            });
             console.info('[Template Trace] parser output', {
                 traceId: templateTraceIdRef.current,
                 pageNum,
-                parsedElements: mergedElements.length,
-                texts: mergedElements.slice(0, 20).map(element => element.text),
+                parsedElements: parsedElements.length,
+                texts: parsedElements.slice(0, 20).map(element => element.text),
             });
-            return mergedElements;
+            return parsedElements;
 
         } catch (e) {
             console.error('[Template Trace] parser failed', {
